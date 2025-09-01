@@ -4,13 +4,24 @@ const errorHandlerMiddleware = (err, req, res, next) => {
     errCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
     errMsg: err.message || 'Something went wrong, please try again later',
   };
+  if (err.name === 'ValidationError') {
+    customError.errCode = StatusCodes.BAD_REQUEST;
+    customError.errMsg = Object.values(err.errors)
+      .map((error) => error.message)
+      .join(',');
+  }
+  if (err.name === 'CastError') {
+    customError.errMsg = `No item found with id: ${err.value}`;
+    customError.errCode = StatusCodes.NOT_FOUND;
+  }
   if (err.code || err.code === 11000) {
     customError.errCode = StatusCodes.BAD_REQUEST;
     customError.errMsg = `Duplicate value entered for ${Object.keys(
       err.keyValue
     )} field, please choose another value`;
   }
-  return res.status(customError.errCode).json({ msg: customError.errMsg });
+  // res.status(customError.errCode).json({ err });
+  res.status(customError.errCode).json({ msg: customError.errMsg });
 };
 
 export default errorHandlerMiddleware;
