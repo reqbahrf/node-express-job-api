@@ -9,6 +9,7 @@ import rateLimiter from 'express-rate-limit';
 // connectDB
 import connectDB from './db/connect.js';
 import authMiddleware from './middleware/authenticated.js';
+import expressSanitizer from './middleware/expressSanitizer.js';
 
 // routers
 import authRouter from './routes/auth.js';
@@ -36,7 +37,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/jobs', authMiddleware, jobRouter);
+app.use('/api/v1/jobs', authMiddleware, expressSanitizer(), jobRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
