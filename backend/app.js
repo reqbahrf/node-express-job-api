@@ -2,6 +2,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
 const app = express();
+import path from 'path';
+
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 //security packages
 import helmet from 'helmet';
 import cors from 'cors';
@@ -23,22 +30,41 @@ import errorHandlerMiddleware from './middleware/error-handler.js';
 app.set('trust proxy', 1);
 app.use(
   rateLimiter({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
   })
 );
 app.use(express.json());
 app.use(helmet());
-app.use(cors());
 
-// routes
-app.get('/', (req, res) => {
-  res.send('jobs api');
-});
+// Enable CORS for development
+if (process.env.NODE_ENV === 'development') {
+  app.use(
+    cors({
+      origin: 'http://localhost:3000',
+      credentials: true,
+    })
+  );
+} else {
+  app.use(cors());
+}
 
+// API routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/jobs', authMiddleware, expressSanitizer(), jobRouter);
 
+// Serve frontend in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React app
+  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+  // Handle React routing, return all requests to React's index.html
+  app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+  });
+}
+
+// Error handling
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
