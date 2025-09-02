@@ -52,20 +52,19 @@ if (process.env.NODE_ENV === 'development') {
 // API routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/jobs', authMiddleware, expressSanitizer(), jobRouter);
-
+app.use(/^(?!\/api\/).*/, notFoundMiddleware);
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React app
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
   // Handle React routing, return all requests to React's index.html
-  app.get(/.*/, (req, res) => {
+  app.get(/^(?!\/api\/).*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
   });
 }
 
 // Error handling
-app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);
 
 const port = process.env.PORT || 3000;
