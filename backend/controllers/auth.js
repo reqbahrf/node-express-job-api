@@ -2,7 +2,7 @@ import User from '../models/User.js';
 import { BadRequestError, UnauthenticatedError } from '../errors/index.js';
 import setTokenCookie from '../utils/auth.js';
 import { StatusCodes } from 'http-status-codes';
-
+import jwt from 'jsonwebtoken';
 const login = async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password)
@@ -28,13 +28,18 @@ const register = async (req, res) => {
 };
 
 const refreshToken = async (req, res) => {
-  const { refreshToken } = req.cookies;
-  if (!refreshToken) throw new UnauthenticatedError('Authentication invalid');
-  const user = await User.findOne({ refreshToken });
-  if (!user) throw new UnauthenticatedError('Authentication invalid');
-  const { accessToken, refreshToken: newRefreshToken } = user.createJWT();
-  setTokenCookie(res, newRefreshToken);
-  res.status(StatusCodes.OK).json({ username: user.name, accessToken });
+  const { resToken } = req.cookies;
+  console.log(resToken);
+  if (!resToken) throw new UnauthenticatedError('Authentication invalid');
+  try {
+    const decode = jwt.verify(resToken, process.env.JWT_REFRESH_SECRET);
+    const user = await User.findOne({ _id: decode.userId });
+    const accessToken = user.generateAccessToken();
+    res.status(StatusCodes.OK).json({ username: user.name, accessToken });
+  } catch (error) {
+    console.log(error);
+    throw new UnauthenticatedError('Authentication invalid');
+  }
 };
 
 export { login, register, logout, refreshToken };

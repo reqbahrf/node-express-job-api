@@ -3,10 +3,11 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
+  Navigate,
   useLocation,
 } from 'react-router-dom';
 import './App.css';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -32,27 +33,38 @@ const App = () => {
   return (
     <Router>
       <AuthProvider>
-        <TitleManager />
-        <Routes>
-          <Route
-            path='/'
-            element={<Home />}
-          />
-          <Route
-            path='/login'
-            element={<Login />}
-          />
-          <Route
-            path='/register'
-            element={<Register />}
-          />
-          <Route
-            path='/dashboard'
-            element={<Dashboard />}
-          />
-        </Routes>
+        <AppContent />
       </AuthProvider>
     </Router>
+  );
+};
+
+const AppContent = () => {
+  const { accessToken, isLoading } = useAuth();
+  console.log(accessToken);
+  if (isLoading) return <p>Loading...</p>;
+  return (
+    <>
+      <TitleManager />
+      <Routes>
+        <Route
+          path='/'
+          element={<Home />}
+        />
+        <Route
+          path='/login'
+          element={<Login />}
+        />
+        <Route
+          path='/register'
+          element={<Register />}
+        />
+        <Route
+          path='/dashboard'
+          element={accessToken ? <Dashboard /> : <Navigate to='/login' />}
+        />
+      </Routes>
+    </>
   );
 };
 

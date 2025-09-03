@@ -17,6 +17,7 @@ interface responseData {
 interface AuthContextType {
   user: string | null;
   accessToken: string | null;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
@@ -26,6 +27,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const login = async (email: string, password: string) => {
     const { data } = await axios.post<responseData>('/api/v1/auth/login', {
@@ -51,21 +53,25 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    axios
-      .get('/api/v1/auth/refresh-token')
-      .then(({ data }) => {
+    const fetchNewToken = async () => {
+      try {
+        const { data } = await axios.get<responseData>(
+          '/api/v1/auth/refresh-token'
+        );
         setUser(data.username);
         setAccessToken(data.accessToken);
-      })
-      .catch(() => {
-        setUser(null);
-        setAccessToken(null);
-      });
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNewToken();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, login, logout, register }}
+      value={{ user, accessToken, isLoading, login, logout, register }}
     >
       {children}
     </AuthContext.Provider>

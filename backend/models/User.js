@@ -28,21 +28,30 @@ UserSchema.pre('save', async function () {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
+UserSchema.methods._generateJWT = function (secret, lifetime) {
+  return jwt.sign({ userId: this._id, username: this.name }, secret, {
+    expiresIn: lifetime,
+  });
+};
+
+UserSchema.methods.generateAccessToken = function () {
+  return this._generateJWT(
+    process.env.JWT_ACCESS_SECRET,
+    process.env.JWT_ACCESS_LIFETIME
+  );
+};
+
+UserSchema.methods.generateRefreshToken = function () {
+  return this._generateJWT(
+    process.env.JWT_REFRESH_SECRET,
+    process.env.JWT_REFRESH_LIFETIME
+  );
+};
+
 UserSchema.methods.createJWT = function () {
-  const generateJWT = (secret, lifetime) => {
-    return jwt.sign({ userId: this._id, username: this.name }, secret, {
-      expiresIn: lifetime,
-    });
-  };
   return {
-    accessToken: generateJWT(
-      process.env.JWT_ACCESS_SECRET,
-      process.env.JWT_ACCESS_LIFETIME
-    ),
-    refreshToken: generateJWT(
-      process.env.JWT_REFRESH_SECRET,
-      process.env.JWT_REFRESH_LIFETIME
-    ),
+    accessToken: this.generateAccessToken(),
+    refreshToken: this.generateRefreshToken(),
   };
 };
 

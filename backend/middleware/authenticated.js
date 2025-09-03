@@ -8,7 +8,7 @@ const auth = async (req, res, next) => {
   }
   const jwtToken = token.split('Bearer ')[1];
   try {
-    const decode = jwt.verify(jwtToken, process.env.JWT_SECRET);
+    const decode = jwt.verify(jwtToken, process.env.JWT_ACCESS_SECRET);
     req.user = { userId: decode.userId, name: decode.name };
     next();
   } catch (error) {
