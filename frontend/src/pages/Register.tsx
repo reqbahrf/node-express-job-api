@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import AuthFormContainer from '../components/AuthFormContainer';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const [formData, setformData] = useState({
     name: '',
     email: '',
@@ -21,8 +24,8 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/v1/auth/register', formData);
-      console.log(response.data);
+      await register(formData.name, formData.email, formData.password);
+      navigate('/dashboard');
     } catch (error) {
       console.error(error);
     }

@@ -29,13 +29,21 @@ UserSchema.pre('save', async function () {
 });
 
 UserSchema.methods.createJWT = function () {
-  return jwt.sign(
-    { userId: this._id, username: this.name },
-    process.env.JWT_SECRET,
-    {
-      expiresIn: process.env.JWT_LIFETIME,
-    }
-  );
+  const generateJWT = (secret, lifetime) => {
+    return jwt.sign({ userId: this._id, username: this.name }, secret, {
+      expiresIn: lifetime,
+    });
+  };
+  return {
+    accessToken: generateJWT(
+      process.env.JWT_ACCESS_SECRET,
+      process.env.JWT_ACCESS_LIFETIME
+    ),
+    refreshToken: generateJWT(
+      process.env.JWT_REFRESH_SECRET,
+      process.env.JWT_REFRESH_LIFETIME
+    ),
+  };
 };
 
 UserSchema.methods.comparePassword = async function (userProvidedPassword) {

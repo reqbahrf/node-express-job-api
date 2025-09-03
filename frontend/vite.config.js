@@ -12,13 +12,11 @@ const __dirname = dirname(__filename);
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    port: 3000,
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
   },

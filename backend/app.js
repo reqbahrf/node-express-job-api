@@ -3,6 +3,7 @@ dotenv.config();
 import express from 'express';
 const app = express();
 import path from 'path';
+import cookieParser from 'cookie-parser';
 
 import { fileURLToPath } from 'url';
 
@@ -35,24 +36,17 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(cookieParser());
 app.use(helmet());
 
 // Enable CORS for development
-if (process.env.NODE_ENV === 'development') {
-  app.use(
-    cors({
-      origin: 'http://localhost:3000',
-      credentials: true,
-    })
-  );
-} else {
-  app.use(cors());
-}
+app.use(
+  cors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  })
+);
 
-// API routes
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/jobs', authMiddleware, expressSanitizer(), jobRouter);
-app.use(/^(?!\/api\/).*/, notFoundMiddleware);
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React app
@@ -63,6 +57,10 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
   });
 }
+// API routes
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/jobs', authMiddleware, expressSanitizer(), jobRouter);
+app.use(/^(?!\/api\/).*/, notFoundMiddleware);
 
 // Error handling
 app.use(errorHandlerMiddleware);

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import AuthFormContainer from '../components/AuthFormContainer';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [formData, setformData] = useState({
     email: '',
     password: '',
@@ -19,8 +21,8 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await axios.post('/api/v1/auth/login', formData);
-      console.log(response.data);
+      await login(formData.email, formData.password);
+      navigate('/dashboard');
     } catch (error) {
       console.error(error);
     }
@@ -120,4 +122,4 @@ const Login = () => {
   );
 };
 
-export default Login
+export default Login;
