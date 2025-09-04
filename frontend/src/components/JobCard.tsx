@@ -9,6 +9,8 @@ export interface JobInfo {
   createdAt: string;
   updatedAt: string;
   __v: number;
+  onUpdate: () => void;
+  onDelete: () => void;
 }
 const JobCard = ({
   company,
@@ -16,6 +18,8 @@ const JobCard = ({
   status,
   createdAt,
   updatedAt,
+  onUpdate,
+  onDelete,
 }: JobInfo) => {
   return (
     <div className='bg-white rounded-lg shadow-md p-6 grid md:grid-cols-[2fr_2fr_auto] grid-cols-1 gap-4'>
@@ -33,10 +37,16 @@ const JobCard = ({
         </p>
       </div>
       <div className='flex flex-col gap-2 justify-center mx-4'>
-        <button className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'>
+        <button
+          onClick={onUpdate}
+          className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'
+        >
           Update
         </button>
-        <button className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'>
+        <button
+          onClick={onDelete}
+          className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
+        >
           Delete
         </button>
       </div>
