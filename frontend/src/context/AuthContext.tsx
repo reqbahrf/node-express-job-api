@@ -38,9 +38,13 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     setAccessToken(data.accessToken);
   };
   const logout = async () => {
-    await axios.post('/api/v1/auth/logout');
-    setUser(null);
-    setAccessToken(null);
+    try {
+      await axios.post('/api/v1/auth/logout');
+      setUser(null);
+      setAccessToken(null);
+    } catch (error) {
+      console.log(error);
+    }
   };
   const register = async (name: string, email: string, password: string) => {
     const { data } = await axios.post<responseData>('/api/v1/auth/register', {
