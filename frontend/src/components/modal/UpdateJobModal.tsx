@@ -23,10 +23,10 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
-    setFromData({
-      ...formData,
+    setFromData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -37,7 +37,7 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-      props.onClose();
+      props.onUpdate();
     } catch (error) {
       console.log(error);
     }

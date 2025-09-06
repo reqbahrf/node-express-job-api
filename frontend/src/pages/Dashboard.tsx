@@ -30,8 +30,29 @@ const Dashboard = () => {
       console.log(error);
     }
   };
+  const handleDeleteJobs = () => {
+    setSelectedJob(null);
+    setOpenDeleteJobModal(false);
+    fetchJobs();
+  };
+
+  const handleUpdateJobs = () => {
+    setSelectedJob(null);
+    setOpenUpdateJobModal(false);
+    fetchJobs();
+  };
+
+  const handleCloseUpdateJobModal = () => {
+    setSelectedJob(null);
+    setOpenUpdateJobModal(false);
+  };
+
+  const handleCloseDeleteJobModal = () => {
+    setSelectedJob(null);
+    setOpenDeleteJobModal(false);
+  };
   useEffect(() => {
-    if (accessToken) fetchJobs();
+    fetchJobs();
   }, [accessToken]);
 
   return (
@@ -88,15 +109,8 @@ const Dashboard = () => {
           company={selectedJob.company}
           position={selectedJob.position}
           status={selectedJob.status}
-          onUpdate={() => {
-            setSelectedJob(null);
-            setOpenUpdateJobModal(false);
-            fetchJobs();
-          }}
-          onClose={() => {
-            setSelectedJob(null);
-            setOpenUpdateJobModal(false);
-          }}
+          onUpdate={handleUpdateJobs}
+          onClose={handleCloseUpdateJobModal}
         />
       )}
       {selectedJob && openDeleteJobModal && (
@@ -105,15 +119,8 @@ const Dashboard = () => {
           company={selectedJob.company}
           position={selectedJob.position}
           status={selectedJob.status}
-          onDelete={() => {
-            setSelectedJob(null);
-            setOpenDeleteJobModal(false);
-            fetchJobs();
-          }}
-          onClose={() => {
-            setSelectedJob(null);
-            setOpenDeleteJobModal(false);
-          }}
+          onDelete={handleDeleteJobs}
+          onClose={handleCloseDeleteJobModal}
         />
       )}
     </>

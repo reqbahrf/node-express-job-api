@@ -10,10 +10,10 @@ const AddJobModal = (props: { onClose: () => void }) => {
     position: '',
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFromData({
-      ...formData,
+    setFromData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
