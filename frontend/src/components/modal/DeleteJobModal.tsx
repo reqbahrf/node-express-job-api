@@ -2,6 +2,7 @@ import React from 'react';
 import MainModal from './MainModal';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../hooks/useLoading';
 interface DeleteJobModalProps {
   jobID: string;
   company: string;
@@ -11,19 +12,18 @@ interface DeleteJobModalProps {
   onClose: () => void;
 }
 const DeleteJobModal = (props: DeleteJobModalProps) => {
+  const deleteLoading = useLoading();
   const { jobID, company, status, position, onDelete, onClose } = props;
   const { accessToken } = useAuth();
-  const handleDelete = async (JobId: string) => {
-    try {
+  const handleDelete = (JobId: string) => {
+    deleteLoading.withLoading(async () => {
       await axios.delete(`/api/v1/jobs/${JobId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
       onDelete();
-    } catch (error) {
-      console.log(error);
-    }
+    });
   };
   return (
     <MainModal
@@ -41,9 +41,10 @@ const DeleteJobModal = (props: DeleteJobModalProps) => {
         <div className='flex justify-end gap-2'>
           <button
             onClick={() => handleDelete(jobID)}
+            disabled={deleteLoading.loading}
             className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
           >
-            Delete
+            {deleteLoading.loading ? 'Deleting...' : 'Delete'}
           </button>
           <button
             onClick={onClose}

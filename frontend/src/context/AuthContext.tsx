@@ -6,6 +6,7 @@ import React, {
   useEffect,
   Children,
 } from 'react';
+import { useLoading } from '../hooks/useLoading';
 import axios from 'axios';
 axios.defaults.withCredentials = true;
 
@@ -17,7 +18,7 @@ interface responseData {
 interface AuthContextType {
   user: string | null;
   accessToken: string | null;
-  isLoading: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
@@ -27,7 +28,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const fetchTokenLoading = useLoading();
 
   const login = async (email: string, password: string) => {
     const { data } = await axios.post<responseData>('/api/v1/auth/login', {
@@ -57,25 +58,28 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    const fetchNewToken = async () => {
-      try {
+    const fetchNewToken = () => {
+      fetchTokenLoading.withLoading(async () => {
         const { data } = await axios.get<responseData>(
           '/api/v1/auth/refresh-token'
         );
         setUser(data.username);
         setAccessToken(data.accessToken);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-      }
+      });
     };
     fetchNewToken();
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, accessToken, isLoading, login, logout, register }}
+      value={{
+        user,
+        accessToken,
+        loading: fetchTokenLoading.loading,
+        login,
+        logout,
+        register,
+      }}
     >
       {children}
     </AuthContext.Provider>

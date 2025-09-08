@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import defaultAvatar from '../assets/avatar-default-icon.png';
 
 function Header() {
   const [toggle, setToggle] = useState(false);
@@ -11,7 +12,11 @@ function Header() {
         <div className='h-full w-auto min-w-[150px] flex items-center'>
           <div className='relative'>
             <button className='md:h-[60px] md:w-[60px] h-[40px] w-[40px] border border-amber-50 rounded-full shadow-lg overflow-hidden'>
-              <span className=''>Logo</span>
+              <img
+                src={defaultAvatar}
+                alt='default avatar'
+                className='w-full h-full object-cover'
+              />
             </button>
             {toggle && (
               <div className='absolute -right-24 top-full w-40 mt-4 py-2 bg-white rounded-md shadow-lg'>

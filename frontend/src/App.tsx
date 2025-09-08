@@ -40,9 +40,8 @@ const App = () => {
 };
 
 const AppContent = () => {
-  const { accessToken, isLoading } = useAuth();
-  console.log(accessToken);
-  if (isLoading) return <p>Loading...</p>;
+  const { accessToken, loading } = useAuth();
+  if (loading) return <p>Loading...</p>;
   return (
     <>
       <TitleManager />

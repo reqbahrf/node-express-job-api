@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import MainModal from './MainModal';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
+import { useLoading } from '../../hooks/useLoading';
 
 interface UpdateJobModalProps {
   jobID: string;
@@ -15,6 +16,7 @@ interface UpdateJobModalProps {
 const UpdateJobModal = (props: UpdateJobModalProps) => {
   const { jobID, company, status, position } = props;
   const { accessToken } = useAuth();
+  const updateLoading = useLoading();
   const [formData, setFromData] = useState({
     company,
     position,
@@ -29,18 +31,16 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
+    updateLoading.withLoading(async () => {
       await axios.patch(`/api/v1/jobs/${jobID}`, formData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
       props.onUpdate();
-    } catch (error) {
-      console.log(error);
-    }
+    });
   };
   return (
     <MainModal
@@ -76,13 +76,14 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
         >
           <option value='pending'>Pending</option>
           <option value='interview'>Interview</option>
-          <option value='rejected'>Rejected</option>
+          <option value='declined'>declined</option>
         </select>
         <button
           type='submit'
+          disabled={updateLoading.loading}
           className='bg-blue-400 text-white px-4 py-2 rounded'
         >
-          Update
+          {updateLoading.loading ? 'Updating...' : 'Update'}
         </button>
       </form>
     </MainModal>

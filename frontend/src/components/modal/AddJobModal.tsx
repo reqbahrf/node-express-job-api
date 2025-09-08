@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import MainModal from './MainModal';
+import { useLoading } from '../../hooks/useLoading';
 
 const AddJobModal = (props: { onClose: () => void }) => {
   const { accessToken } = useAuth();
+  const addLoading = useLoading();
   const [formData, setFromData] = useState({
     company: '',
     position: '',
@@ -16,18 +18,16 @@ const AddJobModal = (props: { onClose: () => void }) => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
+    addLoading.withLoading(async () => {
       await axios.post('/api/v1/jobs', formData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
       props.onClose();
-    } catch (error) {
-      console.log(error);
-    }
+    });
   };
   return (
     <MainModal
@@ -56,9 +56,10 @@ const AddJobModal = (props: { onClose: () => void }) => {
         />
         <button
           type='submit'
+          disabled={addLoading.loading}
           className='bg-blue-500 text-white px-4 py-2 rounded'
         >
-          Submit
+          {addLoading.loading ? 'Submitting...' : 'Submit'}
         </button>
       </form>
     </MainModal>
