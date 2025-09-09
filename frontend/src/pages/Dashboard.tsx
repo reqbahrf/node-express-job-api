@@ -11,12 +11,15 @@ interface JobRes {
   jobs: JobInfo[];
   count: number;
 }
+
+type ModalState = {
+  type: 'add' | 'update' | 'delete' | null;
+  Job: JobInfo | null;
+} | null;
+
 const Dashboard = () => {
   const [jobs, setJobs] = useState<JobInfo[]>([]);
-  const [openAddJobModal, setOpenAddJobModal] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<JobInfo | null>(null);
-  const [openUpdateJobModal, setOpenUpdateJobModal] = useState(false);
-  const [openDeleteJobModal, setOpenDeleteJobModal] = useState(false);
+  const [modal, setModal] = useState<ModalState>({ type: null, Job: null });
   const { accessToken } = useAuth();
   const fetchJobs = async () => {
     try {
@@ -31,25 +34,21 @@ const Dashboard = () => {
     }
   };
   const handleDeleteJobs = () => {
-    setSelectedJob(null);
-    setOpenDeleteJobModal(false);
+    setModal({ type: null, Job: null });
     fetchJobs();
   };
 
   const handleUpdateJobs = () => {
-    setSelectedJob(null);
-    setOpenUpdateJobModal(false);
+    setModal({ type: null, Job: null });
     fetchJobs();
   };
 
   const handleCloseUpdateJobModal = () => {
-    setSelectedJob(null);
-    setOpenUpdateJobModal(false);
+    setModal({ type: null, Job: null });
   };
 
   const handleCloseDeleteJobModal = () => {
-    setSelectedJob(null);
-    setOpenDeleteJobModal(false);
+    setModal({ type: null, Job: null });
   };
   useEffect(() => {
     fetchJobs();
@@ -66,7 +65,7 @@ const Dashboard = () => {
             </h1>
             <button
               className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'
-              onClick={() => setOpenAddJobModal(true)}
+              onClick={() => setModal({ type: 'add', Job: null })}
             >
               Add Job
             </button>
@@ -81,12 +80,10 @@ const Dashboard = () => {
                     key={job._id}
                     {...job}
                     onUpdate={() => {
-                      setSelectedJob(job);
-                      setOpenUpdateJobModal(true);
+                      setModal({ type: 'update', Job: job });
                     }}
                     onDelete={() => {
-                      setSelectedJob(job);
-                      setOpenDeleteJobModal(true);
+                      setModal({ type: 'delete', Job: job });
                     }}
                   />
                 ))
@@ -95,30 +92,30 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      {openAddJobModal && (
+      {modal?.type === 'add' && (
         <AddJobModal
           onClose={() => {
-            setOpenAddJobModal(false);
+            setModal(null);
             fetchJobs();
           }}
         />
       )}
-      {selectedJob && openUpdateJobModal && (
+      {modal?.type === 'update' && modal?.Job && (
         <UpdateJobModal
-          jobID={selectedJob._id}
-          company={selectedJob.company}
-          position={selectedJob.position}
-          status={selectedJob.status}
+          jobID={modal.Job._id}
+          company={modal.Job.company}
+          position={modal.Job.position}
+          status={modal.Job.status}
           onUpdate={handleUpdateJobs}
           onClose={handleCloseUpdateJobModal}
         />
       )}
-      {selectedJob && openDeleteJobModal && (
+      {modal?.type === 'delete' && modal?.Job && (
         <DeleteJobModal
-          jobID={selectedJob._id}
-          company={selectedJob.company}
-          position={selectedJob.position}
-          status={selectedJob.status}
+          jobID={modal?.Job._id}
+          company={modal?.Job.company}
+          position={modal?.Job.position}
+          status={modal?.Job.status}
           onDelete={handleDeleteJobs}
           onClose={handleCloseDeleteJobModal}
         />
