@@ -4,6 +4,7 @@ import React, {
   useContext,
   ReactNode,
   useEffect,
+  useCallback,
   Children,
 } from 'react';
 import { useLoading } from '../hooks/useLoading';
@@ -30,15 +31,15 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const fetchTokenLoading = useLoading();
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     const { data } = await axios.post<responseData>('/api/v1/auth/login', {
       email,
       password,
     });
     setUser(data.username);
     setAccessToken(data.accessToken);
-  };
-  const logout = async () => {
+  }, []);
+  const logout = useCallback(async () => {
     try {
       await axios.post('/api/v1/auth/logout');
       setUser(null);
@@ -46,16 +47,19 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.log(error);
     }
-  };
-  const register = async (name: string, email: string, password: string) => {
-    const { data } = await axios.post<responseData>('/api/v1/auth/register', {
-      name,
-      email,
-      password,
-    });
-    setUser(data.username);
-    setAccessToken(data.accessToken);
-  };
+  }, []);
+  const register = useCallback(
+    async (name: string, email: string, password: string) => {
+      const { data } = await axios.post<responseData>('/api/v1/auth/register', {
+        name,
+        email,
+        password,
+      });
+      setUser(data.username);
+      setAccessToken(data.accessToken);
+    },
+    []
+  );
 
   useEffect(() => {
     const fetchNewToken = () => {

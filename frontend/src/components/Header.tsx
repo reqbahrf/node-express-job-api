@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import defaultAvatar from '../assets/avatar-default-icon.png';
 
-function Header() {
+const Header = () => {
   const [toggle, setToggle] = useState(false);
   const { logout, user, accessToken } = useAuth();
   return (
@@ -43,6 +43,6 @@ function Header() {
       )}
     </div>
   );
-}
+};
 
-export default Header;
+export default memo(Header);

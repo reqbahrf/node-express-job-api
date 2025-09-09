@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 
 export interface JobInfo {
   _id: string;
@@ -9,18 +9,34 @@ export interface JobInfo {
   createdAt: string;
   updatedAt: string;
   __v: number;
-  onUpdate: () => void;
-  onDelete: () => void;
+}
+
+export interface JobCardProps extends JobInfo {
+  onUpdate: (Job: JobInfo) => void;
+  onDelete: (Job: JobInfo) => void;
 }
 const JobCard = ({
+  _id,
   company,
   position,
   status,
+  createdBy,
   createdAt,
   updatedAt,
+  __v,
   onUpdate,
   onDelete,
-}: JobInfo) => {
+}: JobCardProps) => {
+  const jobInfo = {
+    _id,
+    company,
+    position,
+    status,
+    createdBy,
+    createdAt,
+    updatedAt,
+    __v,
+  };
   return (
     <div className='bg-white rounded-lg shadow-md p-6 grid md:grid-cols-[2fr_2fr_auto] grid-cols-1 gap-4'>
       <div>
@@ -51,13 +67,13 @@ const JobCard = ({
       </div>
       <div className='flex flex-col gap-2 justify-center mx-4'>
         <button
-          onClick={onUpdate}
+          onClick={() => onUpdate(jobInfo)}
           className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'
         >
           Update
         </button>
         <button
-          onClick={onDelete}
+          onClick={() => onDelete(jobInfo)}
           className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
         >
           Delete
@@ -67,4 +83,4 @@ const JobCard = ({
   );
 };
 
-export default JobCard;
+export default memo(JobCard);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -21,7 +21,7 @@ const Dashboard = () => {
   const [jobs, setJobs] = useState<JobInfo[]>([]);
   const [modal, setModal] = useState<ModalState>({ type: null, Job: null });
   const { accessToken } = useAuth();
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       const { data } = await axios.get<JobRes>('/api/v1/jobs', {
         headers: {
@@ -32,13 +32,21 @@ const Dashboard = () => {
     } catch (error) {
       console.log(error);
     }
-  };
-  const handleDeleteJobs = () => {
+  }, [accessToken]);
+  const handleUpdateJobs = useCallback((job: JobInfo) => {
+    setModal({ type: 'update', Job: job });
+  }, []);
+
+  const handleDeleteJob = useCallback((Job: JobInfo) => {
+    setModal({ type: 'delete', Job: Job });
+  }, []);
+
+  const handleAfterDeleteJobs = () => {
     setModal({ type: null, Job: null });
     fetchJobs();
   };
 
-  const handleUpdateJobs = () => {
+  const handleAfterUpdateJobs = () => {
     setModal({ type: null, Job: null });
     fetchJobs();
   };
@@ -52,7 +60,7 @@ const Dashboard = () => {
   };
   useEffect(() => {
     fetchJobs();
-  }, [accessToken]);
+  }, [fetchJobs]);
 
   return (
     <>
@@ -79,12 +87,8 @@ const Dashboard = () => {
                   <JobCard
                     key={job._id}
                     {...job}
-                    onUpdate={() => {
-                      setModal({ type: 'update', Job: job });
-                    }}
-                    onDelete={() => {
-                      setModal({ type: 'delete', Job: job });
-                    }}
+                    onUpdate={handleUpdateJobs}
+                    onDelete={handleDeleteJob}
                   />
                 ))
               )}
@@ -106,7 +110,7 @@ const Dashboard = () => {
           company={modal.Job.company}
           position={modal.Job.position}
           status={modal.Job.status}
-          onUpdate={handleUpdateJobs}
+          onUpdate={handleAfterUpdateJobs}
           onClose={handleCloseUpdateJobModal}
         />
       )}
@@ -116,7 +120,7 @@ const Dashboard = () => {
           company={modal?.Job.company}
           position={modal?.Job.position}
           status={modal?.Job.status}
-          onDelete={handleDeleteJobs}
+          onDelete={handleAfterDeleteJobs}
           onClose={handleCloseDeleteJobModal}
         />
       )}

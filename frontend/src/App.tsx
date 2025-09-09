@@ -41,7 +41,11 @@ const App = () => {
 
 const AppContent = () => {
   const { accessToken, loading } = useAuth();
-  if (loading) return <p>Loading...</p>;
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <>
       <TitleManager />
@@ -52,11 +56,11 @@ const AppContent = () => {
         />
         <Route
           path='/login'
-          element={<Login />}
+          element={!accessToken ? <Login /> : <Navigate to='/dashboard' />}
         />
         <Route
           path='/register'
-          element={<Register />}
+          element={!accessToken ? <Register /> : <Navigate to='/dashboard' />}
         />
         <Route
           path='/dashboard'
