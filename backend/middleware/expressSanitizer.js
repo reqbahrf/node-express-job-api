@@ -6,35 +6,39 @@ const expressSanitizer = (options = {}) => {
     allowedAttributes: {},
   };
   const finalOptions = { ...defaultOptions, ...options };
+
   function deepSanitize(value) {
-    if (typeof value === 'string') {
-      return sanitizeHtml(value, finalOptions);
-    } else if (Array.isArray(value)) {
-      return value.map(deepSanitize);
-    } else if (value !== null && typeof value === 'object') {
-      const sanitizedObj = {};
-      for (const key in value) {
+    if (typeof value !== 'object' || value === null) {
+      return typeof value === 'string'
+        ? sanitizeHtml(value, finalOptions)
+        : value;
+    }
+
+    if (Array.isArray(value)) {
+      return value.length > 0 ? value.map(deepSanitize) : value;
+    }
+
+    const sanitizedObj = {};
+    for (const key in value) {
+      if (value.hasOwnProperty(key)) {
         sanitizedObj[key] = deepSanitize(value[key]);
       }
-      return sanitizedObj;
     }
-    return value;
+    return sanitizedObj;
   }
 
   return async (req, res, next) => {
     try {
-      if (req.body) {
+      if (req.body && Object.keys(req.body).length > 0) {
         req.body = deepSanitize(req.body);
       }
-      if (req.query) {
+      if (req.query && Object.keys(req.query).length > 0) {
         const sanitizedQuery = deepSanitize(req.query);
-        Object.keys(sanitizedQuery).forEach((key) => {
-          req.query[key] = sanitizedQuery[key];
-        });
+        Object.assign(req.query, sanitizedQuery);
       }
       next();
     } catch (error) {
-      throw error;
+      next(error);
     }
   };
 };
