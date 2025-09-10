@@ -98,9 +98,9 @@ const Dashboard = () => {
       </div>
       {modal?.type === 'add' && (
         <AddJobModal
+          onSubmit={fetchJobs}
           onClose={() => {
             setModal(null);
-            fetchJobs();
           }}
         />
       )}

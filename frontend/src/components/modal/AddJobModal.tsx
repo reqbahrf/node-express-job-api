@@ -4,7 +4,7 @@ import axios from 'axios';
 import MainModal from './MainModal';
 import { useLoading } from '../../hooks/useLoading';
 
-const AddJobModal = (props: { onClose: () => void }) => {
+const AddJobModal = (props: { onSubmit: () => void; onClose: () => void }) => {
   const { accessToken } = useAuth();
   const addLoading = useLoading();
   const [formData, setFromData] = useState({
@@ -26,6 +26,7 @@ const AddJobModal = (props: { onClose: () => void }) => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+      props.onSubmit();
       props.onClose();
     });
   };

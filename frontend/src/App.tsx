@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -8,10 +8,11 @@ import {
 } from 'react-router-dom';
 import './App.css';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
+const Home = lazy(() => import('./pages/Home'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Loading = lazy(() => import('./components/Loading'));
 
 const titles = {
   '/': 'Landing Page',
@@ -43,7 +44,7 @@ const AppContent = () => {
   const { accessToken, loading } = useAuth();
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   return (
@@ -56,15 +57,27 @@ const AppContent = () => {
         />
         <Route
           path='/login'
-          element={!accessToken ? <Login /> : <Navigate to='/dashboard' />}
+          element={
+            <Suspense fallback={<Loading />}>
+              {!accessToken ? <Login /> : <Navigate to='/dashboard' />}
+            </Suspense>
+          }
         />
         <Route
           path='/register'
-          element={!accessToken ? <Register /> : <Navigate to='/dashboard' />}
+          element={
+            <Suspense fallback={<Loading />}>
+              {!accessToken ? <Register /> : <Navigate to='/dashboard' />}
+            </Suspense>
+          }
         />
         <Route
           path='/dashboard'
-          element={accessToken ? <Dashboard /> : <Navigate to='/login' />}
+          element={
+            <Suspense fallback={<Loading />}>
+              {accessToken ? <Dashboard /> : <Navigate to='/login' />}
+            </Suspense>
+          }
         />
       </Routes>
     </>
