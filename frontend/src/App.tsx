@@ -7,7 +7,10 @@ import {
   useLocation,
 } from 'react-router-dom';
 import './App.css';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
+import { useAppDispatch, useAppSelector } from './app/store';
+import { refreshToken } from './features/auth/authAPI';
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -33,17 +36,22 @@ const TitleManager = () => {
 const App = () => {
   return (
     <Router>
-      <AuthProvider>
+      <Provider store={store}>
         <AppContent />
-      </AuthProvider>
+      </Provider>
     </Router>
   );
 };
 
 const AppContent = () => {
-  const { accessToken, loading } = useAuth();
+  const { isLoading, accessToken } = useAppSelector((state) => state.auth);
 
-  if (loading) {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(refreshToken());
+  }, []);
+  if (isLoading) {
     return <Loading />;
   }
 

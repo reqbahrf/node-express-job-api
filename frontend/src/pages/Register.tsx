@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import AuthFormContainer from '../components/AuthFormContainer';
 import { useNavigate } from 'react-router-dom';
+import { register } from '../features/auth/authAPI';
+import { useAppDispatch } from '../app/store';
 
 const Register = () => {
-  const { register } = useAuth();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [formData, setformData] = useState({
     name: '',
@@ -23,11 +24,9 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      await register(formData.name, formData.email, formData.password);
+    const resultAction = await dispatch(register(formData));
+    if (register.fulfilled.match(resultAction)) {
       navigate('/dashboard');
-    } catch (error) {
-      console.error(error);
     }
   };
 

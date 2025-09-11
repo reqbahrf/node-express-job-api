@@ -1,10 +1,13 @@
 import React, { useState, memo } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { logout } from '../features/auth/authAPI';
 import defaultAvatar from '../assets/avatar-default-icon.png';
+import { useAppSelector } from '../app/store';
+import { useAppDispatch } from '../app/store';
 
 const Header = () => {
   const [toggle, setToggle] = useState(false);
-  const { logout, user, accessToken } = useAuth();
+  const { accessToken, user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   return (
     <div className='bg-sky-500 w-full h-auto min-h-[70px] flex items-center justify-between px-3 py-2 fixed top-0 z-50'>
       <h1 className='text-4xl font-bold text-white'>Job API</h1>
@@ -25,7 +28,7 @@ const Header = () => {
                 </button>
                 <button
                   className='w-full block px-4 py-2 hover:bg-gray-200 text-red-500'
-                  onClick={logout}
+                  onClick={() => dispatch(logout())}
                 >
                   Logout
                 </button>

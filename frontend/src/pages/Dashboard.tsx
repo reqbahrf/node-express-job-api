@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
 import AddJobModal from '../components/modal/AddJobModal';
 import JobCard, { JobInfo } from '../components/JobCard';
 import UpdateJobModal from '../components/modal/UpdateJobModal';
 import DeleteJobModal from '../components/modal/DeleteJobModal';
+import { useAppSelector } from '../app/store';
 
 interface JobRes {
   jobs: JobInfo[];
@@ -20,7 +20,7 @@ type ModalState = {
 const Dashboard = () => {
   const [jobs, setJobs] = useState<JobInfo[]>([]);
   const [modal, setModal] = useState<ModalState>({ type: null, Job: null });
-  const { accessToken } = useAuth();
+  const { accessToken } = useAppSelector((state) => state.auth);
   const fetchJobs = useCallback(async () => {
     try {
       const { data } = await axios.get<JobRes>('/api/v1/jobs', {
