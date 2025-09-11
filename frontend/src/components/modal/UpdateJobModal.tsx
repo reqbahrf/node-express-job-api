@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import MainModal from './MainModal';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
-import { useLoading } from '../../hooks/useLoading';
+import { useAppDispatch, useAppSelector } from '../../app/store';
+import { setLoading } from '../../features/loading/loadingSlice';
 
 interface UpdateJobModalProps {
   jobID: string;
@@ -15,8 +15,11 @@ interface UpdateJobModalProps {
 
 const UpdateJobModal = (props: UpdateJobModalProps) => {
   const { jobID, company, status, position } = props;
-  const { accessToken } = useAuth();
-  const updateLoading = useLoading();
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const isLoading = useAppSelector(
+    (state) => state.loading.loadingState.updateJob
+  );
+  const dispatch = useAppDispatch();
   const [formData, setFromData] = useState({
     company,
     position,
@@ -31,16 +34,17 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    updateLoading.withLoading(async () => {
-      await axios.patch(`/api/v1/jobs/${jobID}`, formData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      props.onUpdate();
+    const dispatchPayload = { key: 'updateJob', loading: true };
+    dispatch(setLoading(dispatchPayload));
+    await axios.patch(`/api/v1/jobs/${jobID}`, formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
+    dispatch(setLoading({ ...dispatchPayload, loading: false }));
+    props.onUpdate();
   };
   return (
     <MainModal
@@ -80,10 +84,10 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
         </select>
         <button
           type='submit'
-          disabled={updateLoading.loading}
+          disabled={isLoading.loading}
           className='bg-blue-400 text-white px-4 py-2 rounded'
         >
-          {updateLoading.loading ? 'Updating...' : 'Update'}
+          {isLoading.loading ? 'Updating...' : 'Update'}
         </button>
       </form>
     </MainModal>

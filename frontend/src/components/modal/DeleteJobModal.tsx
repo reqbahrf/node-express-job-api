@@ -1,8 +1,11 @@
 import React from 'react';
 import MainModal from './MainModal';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
-import { useLoading } from '../../hooks/useLoading';
+import { useAppDispatch, useAppSelector } from '../../app/store';
+import {
+  setLoading,
+  clearAllLoading,
+} from '../../features/loading/loadingSlice';
 interface DeleteJobModalProps {
   jobID: string;
   company: string;
@@ -12,18 +15,22 @@ interface DeleteJobModalProps {
   onClose: () => void;
 }
 const DeleteJobModal = (props: DeleteJobModalProps) => {
-  const deleteLoading = useLoading();
+  const dispatch = useAppDispatch();
   const { jobID, company, status, position, onDelete, onClose } = props;
-  const { accessToken } = useAuth();
-  const handleDelete = (JobId: string) => {
-    deleteLoading.withLoading(async () => {
-      await axios.delete(`/api/v1/jobs/${JobId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      onDelete();
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const isLoading = useAppSelector(
+    (state) => state.loading.loadingState.deleteJob
+  );
+  const handleDelete = async (JobId: string) => {
+    const dispatchPayload = { key: 'deleteJob', loading: true };
+    dispatch(setLoading(dispatchPayload));
+    await axios.delete(`/api/v1/jobs/${JobId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
+    dispatch(setLoading({ ...dispatchPayload, loading: false }));
+    onDelete();
   };
   return (
     <MainModal
@@ -41,10 +48,10 @@ const DeleteJobModal = (props: DeleteJobModalProps) => {
         <div className='flex justify-end gap-2'>
           <button
             onClick={() => handleDelete(jobID)}
-            disabled={deleteLoading.loading}
+            disabled={isLoading.loading}
             className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
           >
-            {deleteLoading.loading ? 'Deleting...' : 'Delete'}
+            {isLoading.loading ? 'Deleting...' : 'Delete'}
           </button>
           <button
             onClick={onClose}

@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
 import MainModal from './MainModal';
-import { useLoading } from '../../hooks/useLoading';
-
+import { useAppDispatch, useAppSelector } from '../../app/store';
+import { setLoading } from '../../features/loading/loadingSlice';
 const AddJobModal = (props: { onSubmit: () => void; onClose: () => void }) => {
-  const { accessToken } = useAuth();
-  const addLoading = useLoading();
+  const dispatch = useAppDispatch();
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const isLoading = useAppSelector(
+    (state) => state.loading.loadingState.addJob
+  );
   const [formData, setFromData] = useState({
     company: '',
     position: '',
@@ -18,17 +20,17 @@ const AddJobModal = (props: { onSubmit: () => void; onClose: () => void }) => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    addLoading.withLoading(async () => {
-      await axios.post('/api/v1/jobs', formData, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      props.onSubmit();
-      props.onClose();
+    dispatch(setLoading({ key: 'addJob', loading: true }));
+    await axios.post('/api/v1/jobs', formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     });
+    dispatch(setLoading({ key: 'addJob', loading: false }));
+    props.onSubmit();
+    props.onClose();
   };
   return (
     <MainModal
@@ -57,10 +59,10 @@ const AddJobModal = (props: { onSubmit: () => void; onClose: () => void }) => {
         />
         <button
           type='submit'
-          disabled={addLoading.loading}
+          disabled={isLoading.loading}
           className='bg-blue-500 text-white px-4 py-2 rounded'
         >
-          {addLoading.loading ? 'Submitting...' : 'Submit'}
+          {isLoading.loading ? 'Submitting...' : 'Submit'}
         </button>
       </form>
     </MainModal>

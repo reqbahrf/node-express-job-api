@@ -44,14 +44,16 @@ const App = () => {
 };
 
 const AppContent = () => {
-  const { isLoading, accessToken } = useAppSelector((state) => state.auth);
+  const { accessToken } = useAppSelector((state) => state.auth);
+  const globalLoading = useAppSelector((state) => state.loading.globalLoading);
+  console.log(globalLoading);
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(refreshToken());
   }, []);
-  if (isLoading) {
+  if (globalLoading) {
     return <Loading />;
   }
 
