@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { logout } from '../features/auth/authAPI';
+import authAPI from '../features/auth/authAPI';
 import defaultAvatar from '../assets/avatar-default-icon.png';
 import { useAppSelector } from '../app/store';
 import { useAppDispatch } from '../app/store';
@@ -28,7 +28,7 @@ const Header = () => {
                 </button>
                 <button
                   className='w-full block px-4 py-2 hover:bg-gray-200 text-red-500'
-                  onClick={() => dispatch(logout())}
+                  onClick={() => dispatch(authAPI.logout())}
                 >
                   Logout
                 </button>

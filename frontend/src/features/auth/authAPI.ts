@@ -17,66 +17,63 @@ interface ResponseAuthData {
   accessToken: string;
 }
 
-const login = createAsyncThunk(
-  'auth/login',
-  async (credentials: Credentials, thunkAPI) => {
+const authAPI = {
+  login: createAsyncThunk(
+    'auth/login',
+    async (credentials: Credentials, thunkAPI) => {
+      try {
+        const dispatchPayload = { key: 'login', loading: true, isGlobal: true };
+        thunkAPI.dispatch(setLoading(dispatchPayload));
+        const { data } = await axios.post<ResponseAuthData>(
+          '/api/v1/auth/login',
+          credentials
+        );
+        thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
+        return data;
+      } catch (error) {
+        return thunkAPI.rejectWithValue(
+          error.response?.data?.message || 'Login failed'
+        );
+      }
+    }
+  ),
+  logout: createAsyncThunk('auth/logout', async (_, thunkAPI) => {
     try {
-      const dispatchPayload = { key: 'login', loading: true, isGlobal: true };
+      const dispatchPayload = { key: 'logout', loading: true, isGlobal: true };
       thunkAPI.dispatch(setLoading(dispatchPayload));
-      const { data } = await axios.post<ResponseAuthData>(
-        '/api/v1/auth/login',
-        credentials
-      );
+      await axios.post('/api/v1/auth/logout');
       thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
-      return data;
+      return null;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || 'Login failed'
+        error.response?.data?.message || 'Logout failed'
       );
     }
-  }
-);
-
-const logout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
-  try {
-    const dispatchPayload = { key: 'logout', loading: true, isGlobal: true };
-    thunkAPI.dispatch(setLoading(dispatchPayload));
-    await axios.post('/api/v1/auth/logout');
-    thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
-    return null;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(
-      error.response?.data?.message || 'Logout failed'
-    );
-  }
-});
-
-const register = createAsyncThunk(
-  'auth/register',
-  async (credentials: RegisterCredential, thunkAPI) => {
-    try {
-      const dispatchPayload = {
-        key: 'register',
-        loading: true,
-        isGlobal: true,
-      };
-      thunkAPI.dispatch(setLoading(dispatchPayload));
-      const { data } = await axios.post<ResponseAuthData>(
-        '/api/v1/auth/register',
-        credentials
-      );
-      thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
-      return data;
-    } catch (err: any) {
-      return thunkAPI.rejectWithValue(
-        err.response?.data?.message || 'Register failed'
-      );
+  }),
+  register: createAsyncThunk(
+    'auth/register',
+    async (credentials: RegisterCredential, thunkAPI) => {
+      try {
+        const dispatchPayload = {
+          key: 'register',
+          loading: true,
+          isGlobal: true,
+        };
+        thunkAPI.dispatch(setLoading(dispatchPayload));
+        const { data } = await axios.post<ResponseAuthData>(
+          '/api/v1/auth/register',
+          credentials
+        );
+        thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
+        return data;
+      } catch (err: any) {
+        return thunkAPI.rejectWithValue(
+          err.response?.data?.message || 'Register failed'
+        );
+      }
     }
-  }
-);
-const refreshToken = createAsyncThunk(
-  'auth/refreshToken',
-  async (_, thunkAPI) => {
+  ),
+  refreshToken: createAsyncThunk('auth/refreshToken', async (_, thunkAPI) => {
     const dispatchPayload = {
       key: 'refreshToken',
       loading: true,
@@ -96,7 +93,7 @@ const refreshToken = createAsyncThunk(
     } finally {
       thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
     }
-  }
-);
+  }),
+};
 
-export { login, logout, register, refreshToken };
+export default authAPI;

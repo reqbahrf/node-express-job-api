@@ -10,7 +10,7 @@ import './App.css';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 import { useAppDispatch, useAppSelector } from './app/store';
-import { refreshToken } from './features/auth/authAPI';
+import authAPI from './features/auth/authAPI';
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -51,7 +51,7 @@ const AppContent = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(refreshToken());
+    dispatch(authAPI.refreshToken());
   }, []);
   if (globalLoading) {
     return <Loading />;

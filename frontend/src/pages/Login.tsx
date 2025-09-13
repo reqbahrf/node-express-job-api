@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AuthFormContainer from '../components/AuthFormContainer';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../features/auth/authAPI';
+import authAPI from '../features/auth/authAPI';
 import { useAppDispatch } from '../app/store';
 
 const Login = () => {
@@ -21,8 +21,8 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const resultAction = await dispatch(login(formData));
-    if (login.fulfilled.match(resultAction)) {
+    const resultAction = await dispatch(authAPI.login(formData));
+    if (authAPI.login.fulfilled.match(resultAction)) {
       navigate('/dashboard');
     }
   };
