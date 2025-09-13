@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import MainModal from './MainModal';
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import { setLoading } from '../../features/loading/loadingSlice';
-const AddJobModal = (props: { onSubmit: () => void; onClose: () => void }) => {
+import jobAPI from '../../features/job/jobAPI';
+const AddJobModal = (props: { onClose: () => void }) => {
   const dispatch = useAppDispatch();
-  const { accessToken } = useAppSelector((state) => state.auth);
   const isLoading = useAppSelector(
-    (state) => state.loading.loadingState.addJob
+    (state) => state.loading.loadingState?.addJob?.loading
   );
   const [formData, setFromData] = useState({
     company: '',
     position: '',
+    status: '',
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFromData((prev) => ({
@@ -23,13 +23,8 @@ const AddJobModal = (props: { onSubmit: () => void; onClose: () => void }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     dispatch(setLoading({ key: 'addJob', loading: true }));
-    await axios.post('/api/v1/jobs', formData, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    dispatch(jobAPI.createNewJob(formData));
     dispatch(setLoading({ key: 'addJob', loading: false }));
-    props.onSubmit();
     props.onClose();
   };
   return (
@@ -59,10 +54,10 @@ const AddJobModal = (props: { onSubmit: () => void; onClose: () => void }) => {
         />
         <button
           type='submit'
-          disabled={isLoading.loading}
+          disabled={isLoading}
           className='bg-blue-500 text-white px-4 py-2 rounded'
         >
-          {isLoading.loading ? 'Submitting...' : 'Submit'}
+          {isLoading ? 'Submitting...' : 'Submit'}
         </button>
       </form>
     </MainModal>

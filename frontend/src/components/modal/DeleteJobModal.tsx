@@ -1,11 +1,8 @@
 import React from 'react';
 import MainModal from './MainModal';
-import axios from 'axios';
 import { useAppDispatch, useAppSelector } from '../../app/store';
-import {
-  setLoading,
-  clearAllLoading,
-} from '../../features/loading/loadingSlice';
+import { setLoading } from '../../features/loading/loadingSlice';
+import jobAPI from '../../features/job/jobAPI';
 interface DeleteJobModalProps {
   jobID: string;
   company: string;
@@ -17,20 +14,20 @@ interface DeleteJobModalProps {
 const DeleteJobModal = (props: DeleteJobModalProps) => {
   const dispatch = useAppDispatch();
   const { jobID, company, status, position, onDelete, onClose } = props;
-  const { accessToken } = useAppSelector((state) => state.auth);
   const isLoading = useAppSelector(
-    (state) => state.loading.loadingState.deleteJob
+    (state) => state.loading.loadingState?.deleteJob?.loading
   );
   const handleDelete = async (JobId: string) => {
     const dispatchPayload = { key: 'deleteJob', loading: true };
     dispatch(setLoading(dispatchPayload));
-    await axios.delete(`/api/v1/jobs/${JobId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    dispatch(setLoading({ ...dispatchPayload, loading: false }));
-    onDelete();
+    try {
+      await dispatch(jobAPI.deleleJob(JobId));
+      onDelete();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      dispatch(setLoading({ ...dispatchPayload, loading: false }));
+    }
   };
   return (
     <MainModal
@@ -48,10 +45,10 @@ const DeleteJobModal = (props: DeleteJobModalProps) => {
         <div className='flex justify-end gap-2'>
           <button
             onClick={() => handleDelete(jobID)}
-            disabled={isLoading.loading}
+            disabled={isLoading}
             className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
           >
-            {isLoading.loading ? 'Deleting...' : 'Delete'}
+            {isLoading ? 'Deleting...' : 'Delete'}
           </button>
           <button
             onClick={onClose}

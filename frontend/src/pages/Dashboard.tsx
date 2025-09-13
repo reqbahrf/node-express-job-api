@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Header from '../components/Header';
-import axios from 'axios';
 import AddJobModal from '../components/modal/AddJobModal';
 import JobCard, { JobInfo } from '../components/JobCard';
 import UpdateJobModal from '../components/modal/UpdateJobModal';
 import DeleteJobModal from '../components/modal/DeleteJobModal';
-import { useAppSelector } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
+import jobAPI from '../features/job/jobAPI';
 
 interface JobRes {
   jobs: JobInfo[];
@@ -18,21 +18,9 @@ type ModalState = {
 } | null;
 
 const Dashboard = () => {
-  const [jobs, setJobs] = useState<JobInfo[]>([]);
+  const dispatch = useAppDispatch();
+  const jobs = useAppSelector((state) => state.job.jobs);
   const [modal, setModal] = useState<ModalState>({ type: null, Job: null });
-  const { accessToken } = useAppSelector((state) => state.auth);
-  const fetchJobs = useCallback(async () => {
-    try {
-      const { data } = await axios.get<JobRes>('/api/v1/jobs', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      setJobs(data.jobs);
-    } catch (error) {
-      console.log(error);
-    }
-  }, [accessToken]);
   const handleUpdateJobs = useCallback((job: JobInfo) => {
     setModal({ type: 'update', Job: job });
   }, []);
@@ -43,12 +31,12 @@ const Dashboard = () => {
 
   const handleAfterDeleteJobs = () => {
     setModal({ type: null, Job: null });
-    fetchJobs();
+    dispatch(jobAPI.fetchJob());
   };
 
   const handleAfterUpdateJobs = () => {
     setModal({ type: null, Job: null });
-    fetchJobs();
+    dispatch(jobAPI.fetchJob());
   };
 
   const handleCloseUpdateJobModal = () => {
@@ -58,10 +46,10 @@ const Dashboard = () => {
   const handleCloseDeleteJobModal = () => {
     setModal({ type: null, Job: null });
   };
-  useEffect(() => {
-    fetchJobs();
-  }, [fetchJobs]);
 
+  useEffect(() => {
+    dispatch(jobAPI.fetchJob());
+  }, []);
   return (
     <>
       <Header />
@@ -98,7 +86,6 @@ const Dashboard = () => {
       </div>
       {modal?.type === 'add' && (
         <AddJobModal
-          onSubmit={fetchJobs}
           onClose={() => {
             setModal(null);
           }}
@@ -109,7 +96,7 @@ const Dashboard = () => {
           jobID={modal.Job._id}
           company={modal.Job.company}
           position={modal.Job.position}
-          status={modal.Job.status}
+          status={modal.Job.status || ''}
           onUpdate={handleAfterUpdateJobs}
           onClose={handleCloseUpdateJobModal}
         />
@@ -119,7 +106,7 @@ const Dashboard = () => {
           jobID={modal?.Job._id}
           company={modal?.Job.company}
           position={modal?.Job.position}
-          status={modal?.Job.status}
+          status={modal?.Job.status || ''}
           onDelete={handleAfterDeleteJobs}
           onClose={handleCloseDeleteJobModal}
         />

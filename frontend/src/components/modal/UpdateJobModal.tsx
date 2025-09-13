@@ -3,6 +3,7 @@ import MainModal from './MainModal';
 import axios from 'axios';
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import { setLoading } from '../../features/loading/loadingSlice';
+import jobAPI from '../../features/job/jobAPI';
 
 interface UpdateJobModalProps {
   jobID: string;
@@ -15,9 +16,8 @@ interface UpdateJobModalProps {
 
 const UpdateJobModal = (props: UpdateJobModalProps) => {
   const { jobID, company, status, position } = props;
-  const { accessToken } = useAppSelector((state) => state.auth);
   const isLoading = useAppSelector(
-    (state) => state.loading.loadingState.updateJob
+    (state) => state.loading.loadingState?.updateJob?.loading
   );
   const dispatch = useAppDispatch();
   const [formData, setFromData] = useState({
@@ -38,11 +38,7 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
     e.preventDefault();
     const dispatchPayload = { key: 'updateJob', loading: true };
     dispatch(setLoading(dispatchPayload));
-    await axios.patch(`/api/v1/jobs/${jobID}`, formData, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    dispatch(jobAPI.updateJob({ jobID, formData }));
     dispatch(setLoading({ ...dispatchPayload, loading: false }));
     props.onUpdate();
   };
@@ -84,10 +80,10 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
         </select>
         <button
           type='submit'
-          disabled={isLoading.loading}
+          disabled={isLoading}
           className='bg-blue-400 text-white px-4 py-2 rounded'
         >
-          {isLoading.loading ? 'Updating...' : 'Update'}
+          {isLoading ? 'Updating...' : 'Update'}
         </button>
       </form>
     </MainModal>

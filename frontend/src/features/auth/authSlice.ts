@@ -3,14 +3,14 @@ import { login, logout, register, refreshToken } from './authAPI';
 
 interface AuthState {
   user: string | null;
-  accessToken: string | null;
+  accessToken: string;
   isLoading: boolean;
   error: string | null;
 }
 
 const initialState: AuthState = {
   user: null,
-  accessToken: null,
+  accessToken: '',
   isLoading: false,
   error: null,
 };
@@ -38,7 +38,7 @@ const authSlice = createSlice({
       // Logout
       .addCase(logout.fulfilled, (state) => {
         state.user = null;
-        state.accessToken = null;
+        state.accessToken = '';
       })
 
       // Register

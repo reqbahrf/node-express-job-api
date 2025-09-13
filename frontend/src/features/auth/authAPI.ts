@@ -77,12 +77,12 @@ const register = createAsyncThunk(
 const refreshToken = createAsyncThunk(
   'auth/refreshToken',
   async (_, thunkAPI) => {
+    const dispatchPayload = {
+      key: 'refreshToken',
+      loading: true,
+      isGlobal: true,
+    };
     try {
-      const dispatchPayload = {
-        key: 'refreshToken',
-        loading: true,
-        isGlobal: true,
-      };
       thunkAPI.dispatch(setLoading(dispatchPayload));
       const { data } = await axios.get<ResponseAuthData>(
         '/api/v1/auth/refresh-token'
@@ -93,6 +93,8 @@ const refreshToken = createAsyncThunk(
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || 'Refresh token failed'
       );
+    } finally {
+      thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
     }
   }
 );

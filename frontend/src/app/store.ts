@@ -2,15 +2,17 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from '../features/auth/authSlice';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import loadingReducer from '../features/loading/loadingSlice';
+import jobReducer from '../features/job/jobSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     loading: loadingReducer,
+    job: jobReducer,
   },
 });
 
-type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof store.getState>;
 type AppDispatch = typeof store.dispatch;
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
