@@ -1,4 +1,4 @@
-const setTokenCookie = (res, refreshToken) => {
+const setTokenCookie = (res: any, refreshToken: string) => {
   res.cookie('resToken', refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

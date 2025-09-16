@@ -1,11 +1,11 @@
 import Job from '../models/Job.js';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError, NotFoundError } from '../errors/index.js';
-const getAllJobs = async (req, res) => {
+const getAllJobs = async (req: any, res: any) => {
   const jobs = await Job.find({ createdBy: req.user.userId }).sort('createdAt');
   res.status(StatusCodes.OK).json({ jobs, count: jobs.length });
 };
-const getJob = async (req, res) => {
+const getJob = async (req: any, res: any) => {
   const {
     params: { id: jobId },
     user: { userId },
@@ -17,13 +17,13 @@ const getJob = async (req, res) => {
   res.status(StatusCodes.OK).json({ job });
 };
 
-const createJob = async (req, res) => {
+const createJob = async (req: any, res: any) => {
   req.body.createdBy = req.user.userId;
   const job = await Job.create(req.body);
   res.status(StatusCodes.CREATED).json({ job });
 };
 
-const updateJob = async (req, res) => {
+const updateJob = async (req: any, res: any) => {
   const {
     body: { company, position },
     params: { id: jobId },
@@ -46,7 +46,7 @@ const updateJob = async (req, res) => {
   res.status(StatusCodes.OK).json({ job });
 };
 
-const deleteJob = async (req, res) => {
+const deleteJob = async (req: any, res: any) => {
   const {
     params: { id: jobId },
     user: { userId },

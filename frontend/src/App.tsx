@@ -46,7 +46,6 @@ const App = () => {
 const AppContent = () => {
   const { accessToken } = useAppSelector((state) => state.auth);
   const globalLoading = useAppSelector((state) => state.loading.globalLoading);
-  console.log(globalLoading);
 
   const dispatch = useAppDispatch();
 

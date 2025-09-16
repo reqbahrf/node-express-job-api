@@ -1,7 +1,18 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Schema } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-const UserSchema = new mongoose.Schema({
+
+interface IUser extends Document {
+  name: string;
+  email: string;
+  password: string;
+  _generateJWT(secret: string, lifetime: string): string;
+  generateAccessToken(): string;
+  generateRefreshToken(): string;
+  createJWT(): { accessToken: string; refreshToken: string };
+  comparePassword(userProvidedPassword: string): Promise<boolean>;
+}
+const UserSchema = new mongoose.Schema<IUser>({
   name: {
     type: String,
     required: [true, 'Please provide name'],
@@ -24,38 +35,46 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
-UserSchema.pre('save', async function () {
+UserSchema.pre('save', async function (): Promise<void> {
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-UserSchema.methods._generateJWT = function (secret, lifetime) {
+UserSchema.methods._generateJWT = function (
+  secret: jwt.Secret,
+  lifetime: jwt.SignOptions['expiresIn']
+): string {
   return jwt.sign({ userId: this._id, username: this.name }, secret, {
     expiresIn: lifetime,
   });
 };
 
-UserSchema.methods.generateAccessToken = function () {
+UserSchema.methods.generateAccessToken = function (): string {
   return this._generateJWT(
     process.env.JWT_ACCESS_SECRET,
     process.env.JWT_ACCESS_LIFETIME
   );
 };
 
-UserSchema.methods.generateRefreshToken = function () {
+UserSchema.methods.generateRefreshToken = function (): string {
   return this._generateJWT(
     process.env.JWT_REFRESH_SECRET,
     process.env.JWT_REFRESH_LIFETIME
   );
 };
 
-UserSchema.methods.createJWT = function () {
+UserSchema.methods.createJWT = function (): {
+  accessToken: string;
+  refreshToken: string;
+} {
   return {
     accessToken: this.generateAccessToken(),
     refreshToken: this.generateRefreshToken(),
   };
 };
 
-UserSchema.methods.comparePassword = async function (userProvidedPassword) {
+UserSchema.methods.comparePassword = async function (
+  userProvidedPassword: string
+): Promise<boolean> {
   const isMatch = await bcrypt.compare(userProvidedPassword, this.password);
   return isMatch;
 };
