@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const connectDB = (url) => {
+const connectDB = (url: string) => {
   const options = {
     maxPoolSize: 10,
     serverSelectionTimeoutMS: 5000,

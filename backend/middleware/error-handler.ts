@@ -1,12 +1,19 @@
 import { StatusCodes } from 'http-status-codes';
-const errorHandlerMiddleware = (err, req, res, next) => {
+import { Request, Response, NextFunction } from 'express';
+import { CustomError } from '../errors/index.js';
+const errorHandlerMiddleware = (
+  err: CustomError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let customError = {
     errCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
     errMsg: err.message || 'Something went wrong, please try again later',
   };
   if (err.name === 'ValidationError') {
     customError.errCode = StatusCodes.BAD_REQUEST;
-    customError.errMsg = Object.values(err.errors)
+    customError.errMsg = Object.values(err.errors || {})
       .map((error) => error.message)
       .join(',');
   }

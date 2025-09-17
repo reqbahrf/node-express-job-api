@@ -33,8 +33,13 @@ const refreshToken = async (req, res) => {
     if (!resToken)
         throw new UnauthenticatedError('Authentication invalid');
     try {
-        const decode = jwt.verify(resToken, process.env.JWT_REFRESH_SECRET);
+        const secret = process.env.JWT_REFRESH_SECRET;
+        if (!secret)
+            throw new UnauthenticatedError('Authentication invalid');
+        const decode = jwt.verify(resToken, secret);
         const user = await User.findOne({ _id: decode.userId });
+        if (!user)
+            return;
         const accessToken = user.generateAccessToken();
         res.status(StatusCodes.OK).json({ username: user.name, accessToken });
     }

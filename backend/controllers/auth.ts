@@ -3,13 +3,14 @@ import { BadRequestError, UnauthenticatedError } from '../errors/index.js';
 import setTokenCookie from '../utils/auth.js';
 import { StatusCodes } from 'http-status-codes';
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import { Request, Response } from 'express';
 
 interface UserJwtPayload extends JwtPayload {
   userId: string;
   username: string;
 }
 
-const login = async (req: any, res: any) => {
+const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (!email || !password)
     throw new BadRequestError('Please provide the email and password');
@@ -22,18 +23,18 @@ const login = async (req: any, res: any) => {
   setTokenCookie(res, refreshToken);
   res.status(StatusCodes.OK).json({ username: user.name, accessToken });
 };
-const logout = async (req: any, res: any) => {
+const logout = async (req: Request, res: Response) => {
   res.clearCookie('resToken');
   res.status(StatusCodes.OK).json({ message: 'User logged out' });
 };
-const register = async (req: any, res: any) => {
+const register = async (req: Request, res: Response) => {
   const user = await User.create(req.body);
   const { accessToken, refreshToken } = user.createJWT();
   setTokenCookie(res, refreshToken);
   res.status(StatusCodes.CREATED).json({ username: user.name, accessToken });
 };
 
-const refreshToken = async (req: any, res: any) => {
+const refreshToken = async (req: Request, res: Response) => {
   const { resToken } = req.cookies;
   console.log(resToken);
   if (!resToken) throw new UnauthenticatedError('Authentication invalid');
