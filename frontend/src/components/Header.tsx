@@ -6,7 +6,10 @@ import { useAppDispatch } from '../app/store';
 
 const Header = () => {
   const [toggle, setToggle] = useState(false);
-  const { accessToken, user } = useAppSelector((state) => state.auth);
+  const { accessToken, user, role } = useAppSelector((state) => state.auth);
+  const formattedRole = role
+    ? role?.charAt(0).toUpperCase() + role?.slice(1)
+    : '';
   const dispatch = useAppDispatch();
   return (
     <div className='bg-sky-500 w-full h-auto min-h-[70px] flex items-center justify-between px-3 py-2 fixed top-0 z-50'>
@@ -35,13 +38,16 @@ const Header = () => {
               </div>
             )}
           </div>
-          <button
-            type='button'
-            className='text-2xl font-bold text-black ps-2'
-            onClick={() => setToggle(!toggle)}
-          >
-            {user}
-          </button>
+          <div className='flex-col justify-center'>
+            <button
+              type='button'
+              className='text-2xl font-bold text-black ps-2'
+              onClick={() => setToggle(!toggle)}
+            >
+              {user}
+            </button>
+            <div className='text-center text-black ps-2'>{formattedRole}</div>
+          </div>
         </div>
       )}
     </div>

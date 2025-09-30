@@ -53,7 +53,7 @@ const Dashboard = () => {
   return (
     <>
       <Header />
-      <div className=' bg-amber-50 min-h-screen flex justify-center'>
+      <div className=' bg-white min-h-screen flex justify-center'>
         <div className='md:w-1/2 w-full h-[80vh] mt-[100px] sm:mx-[20px]'>
           <div className='flex justify-between'>
             <h1 className='md:text-4xl text-2xl mx-4 font-bold text-gray-900'>

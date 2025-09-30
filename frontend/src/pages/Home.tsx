@@ -4,7 +4,7 @@ import Header from '../components/Header';
 
 const Home = () => {
   return (
-    <div className='min-h-screen flex flex-col bg-amber-50'>
+    <div className='min-h-screen flex flex-col bg-white'>
       <Header />
       <div className='flex-1 flex flex-col md:flex-row items-center justify-center p-8 gap-8'>
         <div className='text-lg text-gray-600 max-w-2xl md:h-[25vh] flex items-center'>

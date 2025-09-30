@@ -42,6 +42,8 @@ const UserSchema = new mongoose.Schema<IUser>({
 });
 
 UserSchema.pre('save', async function (): Promise<void> {
+  const isAdmin = process.env.ADMIN_ACCOUNTS?.split(',').includes(this.email);
+  if (isAdmin) this.role = 'admin';
   this.password = await bcrypt.hash(this.password, 10);
 });
 
