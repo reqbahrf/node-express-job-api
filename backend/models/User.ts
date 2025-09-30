@@ -6,6 +6,7 @@ interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  role: string;
   _generateJWT(secret: string, lifetime: string): string;
   generateAccessToken(): string;
   generateRefreshToken(): string;
@@ -28,6 +29,11 @@ const UserSchema = new mongoose.Schema<IUser>({
     ],
     unique: true,
   },
+  role: {
+    type: String,
+    enum: ['applicant', 'admin'],
+    default: 'applicant',
+  },
   password: {
     type: String,
     required: [true, 'Please provide password'],
@@ -43,9 +49,13 @@ UserSchema.methods._generateJWT = function (
   secret: jwt.Secret,
   lifetime: jwt.SignOptions['expiresIn']
 ): string {
-  return jwt.sign({ userId: this._id, username: this.name }, secret, {
-    expiresIn: lifetime,
-  });
+  return jwt.sign(
+    { userId: this._id, username: this.name, role: this.role },
+    secret,
+    {
+      expiresIn: lifetime,
+    }
+  );
 };
 
 UserSchema.methods.generateAccessToken = function (): string {
