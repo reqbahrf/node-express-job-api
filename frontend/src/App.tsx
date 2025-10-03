@@ -15,7 +15,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Loading = lazy(() => import('./components/Loading'));
+import Loading from './components/Loading';
 
 const titles = {
   '/': 'Landing Page',
