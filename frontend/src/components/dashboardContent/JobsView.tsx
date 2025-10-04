@@ -4,6 +4,7 @@ import JobCard, { JobInfo } from '../JobCard';
 const UpdateJobModal = lazy(() => import('../modal/UpdateJobModal'));
 const DeleteJobModal = lazy(() => import('../modal/DeleteJobModal'));
 import { useAppDispatch, useAppSelector } from '../../app/store';
+import io from 'socket.io-client';
 import jobAPI from '../../features/job/jobAPI';
 import Loading from '../Loading';
 
