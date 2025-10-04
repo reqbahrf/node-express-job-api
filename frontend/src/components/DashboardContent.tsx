@@ -1,5 +1,4 @@
 import React from 'react';
-
 type DashboardContentProps = {
   children: React.ReactNode;
 };

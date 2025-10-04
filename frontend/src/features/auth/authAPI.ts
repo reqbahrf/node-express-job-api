@@ -13,6 +13,7 @@ interface RegisterCredential extends Credentials {
 }
 
 interface ResponseAuthData {
+  userid: string;
   username: string;
   role: string;
   accessToken: string;

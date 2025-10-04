@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import io, { Socket } from 'socket.io-client';
 
-const useSocket = (userid?: string) => {
+const useSocket = (userid: string, role: string) => {
   const [isConnected, setIsConnected] = useState(false);
   const [userCount, setUserCount] = useState(0);
   const socketRef = useRef<Socket | null>(null);
@@ -9,13 +9,15 @@ const useSocket = (userid?: string) => {
     const socket = io('http://localhost:3000');
     socketRef.current = socket;
     socket.on('connect', () => {
-      if (userid) {
+      if (userid && role !== 'admin') {
         socket.emit('join', userid);
         setIsConnected(true);
       }
     });
     socket.on('disconnect', () => {
-      setIsConnected(false);
+      if (role !== 'admin') {
+        setIsConnected(false);
+      }
     });
     socket.on('rt-user-count', (count) => {
       setUserCount(count);

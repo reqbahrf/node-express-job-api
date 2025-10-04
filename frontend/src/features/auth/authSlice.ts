@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import authAPI from './authAPI';
 
 interface AuthState {
+  userid: string | null;
   user: string | null;
   role: string | null;
   accessToken: string;
@@ -11,6 +12,7 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
+  userid: null,
   user: null,
   role: null,
   accessToken: '',
@@ -31,6 +33,7 @@ const authSlice = createSlice({
       })
       .addCase(authAPI.login.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.userid = action.payload.userid;
         state.user = action.payload.username;
         state.role = action.payload.role;
         state.accessToken = action.payload.accessToken;
@@ -53,6 +56,7 @@ const authSlice = createSlice({
       })
       .addCase(authAPI.register.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.userid = action.payload.userid;
         state.user = action.payload.username;
         state.role = action.payload.role;
         state.accessToken = action.payload.accessToken;
@@ -64,6 +68,7 @@ const authSlice = createSlice({
 
       // Refresh token
       .addCase(authAPI.refreshToken.fulfilled, (state, action) => {
+        state.userid = action.payload.userid;
         state.user = action.payload.username;
         state.role = action.payload.role;
         state.accessToken = action.payload.accessToken;

@@ -29,7 +29,12 @@ const register = async (req, res) => {
     setTokenCookie(res, refreshToken);
     res
         .status(StatusCodes.CREATED)
-        .json({ username: user.name, role: user.role, accessToken });
+        .json({
+        userid: user._id,
+        username: user.name,
+        role: user.role,
+        accessToken,
+    });
 };
 const refreshToken = async (req, res) => {
     const { resToken } = req.cookies;
@@ -47,7 +52,12 @@ const refreshToken = async (req, res) => {
         const accessToken = user.generateAccessToken();
         res
             .status(StatusCodes.OK)
-            .json({ username: user.name, role: user.role, accessToken });
+            .json({
+            userid: user._id,
+            username: user.name,
+            role: user.role,
+            accessToken,
+        });
     }
     catch (error) {
         console.log(error);
