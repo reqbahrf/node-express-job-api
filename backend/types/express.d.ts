@@ -3,6 +3,7 @@ import { Request } from 'express';
 interface UserPayload {
   userId: string;
   username: string;
+  role: string;
 }
 
 declare global {

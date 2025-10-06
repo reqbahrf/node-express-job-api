@@ -18,12 +18,15 @@ import cors from 'cors';
 import rateLimiter from 'express-rate-limit';
 // connectDB
 import connectDB from './db/connect.js';
+
+import adminUser from './middleware/adminUser.js';
 import authMiddleware from './middleware/authenticated.js';
 import expressSanitizer from './middleware/expressSanitizer.js';
 
 // routers
 import authRouter from './routes/auth.js';
 import jobRouter from './routes/jobs.js';
+import adminRouter from './routes/adminDashboard.js';
 
 // error handler
 import notFoundMiddleware from './middleware/not-found.js';
@@ -87,6 +90,8 @@ if (process.env.NODE_ENV === 'production') {
     res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
   });
 }
+
+app.use('/api/v1/admin', authMiddleware, adminUser, adminRouter);
 // API routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/jobs', authMiddleware, expressSanitizer(), jobRouter);
