@@ -4,23 +4,21 @@ import JobCard, { JobInfo } from '../JobCard';
 const UpdateJobModal = lazy(() => import('../modal/UpdateJobModal'));
 const DeleteJobModal = lazy(() => import('../modal/DeleteJobModal'));
 import { useAppDispatch, useAppSelector } from '../../app/store';
-import io from 'socket.io-client';
 import jobAPI from '../../features/job/jobAPI';
 import Loading from '../Loading';
-
-interface JobRes {
-  jobs: JobInfo[];
-  count: number;
-}
-
-type ModalState = {
-  type: 'add' | 'update' | 'delete' | null;
-  Job: JobInfo | null;
-} | null;
+import useSocket from '../../hooks/useSocket';
+type ModalState =
+  | {
+      type: 'add' | 'update' | 'delete' | null;
+      Job: JobInfo | null;
+    }
+  | { type: null; Job: null };
 
 const JobsView = () => {
   const dispatch = useAppDispatch();
   const jobs = useAppSelector((state) => state.job.jobs);
+  const { userid, role } = useAppSelector((state) => state.auth);
+  const { isConnected, userCount } = useSocket(userid || '', role || '');
   const [modal, setModal] = useState<ModalState>({ type: null, Job: null });
   const handleUpdateJobs = useCallback((job: JobInfo) => {
     setModal({ type: 'update', Job: job });
@@ -30,27 +28,13 @@ const JobsView = () => {
     setModal({ type: 'delete', Job: Job });
   }, []);
 
-  const handleAfterDeleteJobs = () => {
+  const handleAfterModalActionJobs = useCallback(() => {
     setModal({ type: null, Job: null });
-    dispatch(jobAPI.fetchJob());
-  };
-
-  const handleAfterUpdateJobs = () => {
-    setModal({ type: null, Job: null });
-    dispatch(jobAPI.fetchJob());
-  };
-
-  const handleCloseUpdateJobModal = () => {
-    setModal({ type: null, Job: null });
-  };
-
-  const handleCloseDeleteJobModal = () => {
-    setModal({ type: null, Job: null });
-  };
+  }, []);
 
   useEffect(() => {
     dispatch(jobAPI.fetchJob());
-  }, []);
+  }, [dispatch]);
   return (
     <>
       {' '}
@@ -87,11 +71,7 @@ const JobsView = () => {
       </div>
       <Suspense fallback={<Loading />}>
         {modal?.type === 'add' && (
-          <AddJobModal
-            onClose={() => {
-              setModal(null);
-            }}
-          />
+          <AddJobModal onClose={handleAfterModalActionJobs} />
         )}
         {modal?.type === 'update' && modal?.Job && (
           <UpdateJobModal
@@ -99,8 +79,7 @@ const JobsView = () => {
             company={modal.Job.company}
             position={modal.Job.position}
             status={modal.Job.status || ''}
-            onUpdate={handleAfterUpdateJobs}
-            onClose={handleCloseUpdateJobModal}
+            onClose={handleAfterModalActionJobs}
           />
         )}
         {modal?.type === 'delete' && modal?.Job && (
@@ -109,8 +88,7 @@ const JobsView = () => {
             company={modal?.Job.company}
             position={modal?.Job.position}
             status={modal?.Job.status || ''}
-            onDelete={handleAfterDeleteJobs}
-            onClose={handleCloseDeleteJobModal}
+            onClose={handleAfterModalActionJobs}
           />
         )}
       </Suspense>

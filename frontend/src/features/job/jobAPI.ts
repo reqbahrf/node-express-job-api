@@ -6,7 +6,7 @@ import { RootState } from '../../app/store';
 interface FromData {
   company: string;
   position: string;
-  status: string;
+  status?: string;
 }
 
 const getAccessToken = (thunkAPI: any) => {
@@ -33,12 +33,16 @@ const jobAPI = {
     'post/job',
     async (formData: FromData, thunkAPI) => {
       try {
-        const { data } = await axios.post<JobInfo>('/api/v1/jobs', formData, {
-          headers: {
-            Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
-          },
-        });
-        return data;
+        const { data } = await axios.post<{ job: JobInfo }>(
+          '/api/v1/jobs',
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
+            },
+          }
+        );
+        return data.job;
       } catch (error) {
         return thunkAPI.rejectWithValue(
           error.response?.data?.message || 'Create job failed'

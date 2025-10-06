@@ -33,7 +33,7 @@ const jobSlice = createSlice({
           ...state.jobs[index],
           company,
           position,
-          status,
+          status: status || '',
         };
       }
     });

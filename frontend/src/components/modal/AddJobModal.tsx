@@ -11,7 +11,6 @@ const AddJobModal = (props: { onClose: () => void }) => {
   const [formData, setFromData] = useState({
     company: '',
     position: '',
-    status: '',
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFromData((prev) => ({
@@ -22,10 +21,17 @@ const AddJobModal = (props: { onClose: () => void }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(setLoading({ key: 'addJob', loading: true }));
-    dispatch(jobAPI.createNewJob(formData));
-    dispatch(setLoading({ key: 'addJob', loading: false }));
-    props.onClose();
+    const dispatchPayload = { key: 'addJob', loading: true };
+    dispatch(setLoading(dispatchPayload));
+
+    try {
+      await dispatch(jobAPI.createNewJob(formData)).unwrap();
+      props.onClose();
+    } catch (err) {
+      console.error('Failed to add job:', err);
+    } finally {
+      dispatch(setLoading({ ...dispatchPayload, loading: false }));
+    }
   };
   return (
     <MainModal

@@ -13,8 +13,8 @@ const Home = () => {
               Welcome to Job API
             </h1>
             <p className='text-lg text-gray-600 text-center'>
-              a web application that allows you to search for jobs and connect
-              with potential employers.
+              A web application that allows you to record and manage your job
+              applications.
             </p>
           </div>
         </div>

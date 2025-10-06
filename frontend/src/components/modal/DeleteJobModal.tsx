@@ -8,12 +8,11 @@ interface DeleteJobModalProps {
   company: string;
   status: string;
   position: string;
-  onDelete: () => void;
   onClose: () => void;
 }
 const DeleteJobModal = (props: DeleteJobModalProps) => {
   const dispatch = useAppDispatch();
-  const { jobID, company, status, position, onDelete, onClose } = props;
+  const { jobID, company, status, position, onClose } = props;
   const isLoading = useAppSelector(
     (state) => state.loading.loadingState?.deleteJob?.loading
   );
@@ -22,7 +21,7 @@ const DeleteJobModal = (props: DeleteJobModalProps) => {
     dispatch(setLoading(dispatchPayload));
     try {
       await dispatch(jobAPI.deleleJob(JobId));
-      onDelete();
+      onClose();
     } catch (error) {
       console.log(error);
     } finally {

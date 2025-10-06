@@ -10,7 +10,6 @@ interface UpdateJobModalProps {
   company: string;
   status: string;
   position: string;
-  onUpdate: () => void;
   onClose: () => void;
 }
 
@@ -38,9 +37,15 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
     e.preventDefault();
     const dispatchPayload = { key: 'updateJob', loading: true };
     dispatch(setLoading(dispatchPayload));
-    dispatch(jobAPI.updateJob({ jobID, formData }));
-    dispatch(setLoading({ ...dispatchPayload, loading: false }));
-    props.onUpdate();
+
+    try {
+      await dispatch(jobAPI.updateJob({ jobID, formData })).unwrap();
+      props.onClose();
+    } catch (err) {
+      console.error('Failed to update job:', err);
+    } finally {
+      dispatch(setLoading({ ...dispatchPayload, loading: false }));
+    }
   };
   return (
     <MainModal
