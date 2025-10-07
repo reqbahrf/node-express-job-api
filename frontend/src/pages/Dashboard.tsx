@@ -26,8 +26,8 @@ const Dashboard = () => {
       <Header />
       {/* Dashboard content */}
       <DashboardContent>
-        <div className=' bg-white min-h-screen flex justify-center'>
-          <div className='md:w-1/2 w-full h-[80vh] mt-[100px] sm:mx-[20px]'>
+        <div className=' bg-white dark:bg-gray-700 min-h-screen flex justify-center'>
+          <div className='md:w-1/2 w-full h-[80vh] mt-[100px] sm:mx-[20px] dark:text-white'>
             <Suspense fallback={<Loading />}>{renderContent()}</Suspense>
           </div>
         </div>
