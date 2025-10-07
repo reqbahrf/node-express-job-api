@@ -36,16 +36,14 @@ const AdminView = () => {
     };
   }, []);
   return (
-    <div className=' bg-white min-h-screen flex justify-center'>
-      <div className='md:w-1/2 w-full h-[80vh] mt-[100px] sm:mx-[20px]'>
+    <>
         Welcome back Admin {user}
         <p>
           Online Users:&nbsp;
           <span className='bg-green-500 h-[10px] w-[10px] rounded-full inline-block mr-1'></span>
           {userCount}/{stats.applicantUserCount}
         </p>
-      </div>
-    </div>
+    </>
   );
 };
 

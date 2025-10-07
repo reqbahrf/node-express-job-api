@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import reducer from '../loading/loadingSlice';
 import { JobInfo } from '../../components/JobCard';
 import jobAPI from './jobAPI';
 

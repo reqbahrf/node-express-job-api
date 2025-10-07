@@ -38,35 +38,31 @@ const JobsView = () => {
   return (
     <>
       {' '}
-      <div className=' bg-white min-h-screen flex justify-center'>
-        <div className='md:w-1/2 w-full h-[80vh] mt-[100px] sm:mx-[20px]'>
-          <div className='flex justify-between'>
-            <h1 className='md:text-4xl text-2xl mx-4 font-bold text-gray-900'>
-              Jobs
-            </h1>
-            <button
-              className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'
-              onClick={() => setModal({ type: 'add', Job: null })}
-            >
-              Add Job
-            </button>
-          </div>
-          <div className='w-full h-full mt-4 sm:mx-[20px] bg-white rounded-lg shadow-lg overflow-y-scroll'>
-            <div className='flex flex-col gap-4 p-4'>
-              {jobs.length === 0 ? (
-                <p className='text-center text-gray-600'>No jobs found</p>
-              ) : (
-                jobs.map((job) => (
-                  <JobCard
-                    key={job._id}
-                    {...job}
-                    onUpdate={handleUpdateJobs}
-                    onDelete={handleDeleteJob}
-                  />
-                ))
-              )}
-            </div>
-          </div>
+      <div className='flex justify-between'>
+        <h1 className='md:text-4xl text-2xl mx-4 font-bold text-gray-900'>
+          Jobs
+        </h1>
+        <button
+          className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'
+          onClick={() => setModal({ type: 'add', Job: null })}
+        >
+          Add Job
+        </button>
+      </div>
+      <div className='w-full h-full mt-4 sm:mx-[20px] bg-white rounded-lg shadow-lg overflow-y-scroll'>
+        <div className='flex flex-col gap-4 p-4'>
+          {jobs.length === 0 ? (
+            <p className='text-center text-gray-600'>No jobs found</p>
+          ) : (
+            jobs.map((job) => (
+              <JobCard
+                key={job._id}
+                {...job}
+                onUpdate={handleUpdateJobs}
+                onDelete={handleDeleteJob}
+              />
+            ))
+          )}
         </div>
       </div>
       <Suspense fallback={<Loading />}>
