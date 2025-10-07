@@ -36,7 +36,7 @@ const Login = () => {
           className='mt-8 space-y-6'
           onSubmit={handleSubmit}
         >
-          <div className='rounded-md shadow-sm -space-y-px'>
+          <div className='rounded-md shadow-sm space-y-px'>
             <div>
               <label
                 htmlFor='email'
@@ -85,7 +85,7 @@ const Login = () => {
               />
               <label
                 htmlFor='remember-me'
-                className='ml-2 block text-sm text-gray-900'
+                className='ml-2 block text-sm text-gray-900 dark:text-white'
               >
                 Remember me
               </label>
@@ -94,7 +94,7 @@ const Login = () => {
             <div className='text-sm'>
               <a
                 href='#'
-                className='font-medium text-blue-600 hover:text-blue-500'
+                className='font-medium text-blue-600 hover:text-blue-500 '
               >
                 Forgot your password?
               </a>
@@ -110,7 +110,7 @@ const Login = () => {
             </button>
           </div>
 
-          <div className='text-sm text-center'>
+          <div className='text-sm text-center dark:text-white'>
             Don't have an account?{' '}
             <Link
               to='/register'

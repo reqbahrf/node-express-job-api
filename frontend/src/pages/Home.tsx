@@ -4,15 +4,15 @@ import Header from '../components/Header';
 
 const Home = () => {
   return (
-    <div className='min-h-screen flex flex-col bg-white'>
+    <div className='min-h-screen flex flex-col bg-white dark:bg-gray-600'>
       <Header />
       <div className='flex-1 flex flex-col md:flex-row items-center justify-center p-8 gap-8'>
-        <div className='text-lg text-gray-600 max-w-2xl md:h-[25vh] flex items-center'>
+        <div className='text-lg text-gray-600 dark:text-white max-w-2xl md:h-[25vh] flex items-center'>
           <div className='flex flex-col'>
-            <h1 className='text-4xl font-bold text-gray-900 text-center'>
+            <h1 className='text-4xl font-bold text-gray-900 dark:text-white text-center'>
               Welcome to Job API
             </h1>
-            <p className='text-lg text-gray-600 text-center'>
+            <p className='text-lg text-gray-600 dark:text-white text-center'>
               A web application that allows you to record and manage your job
               applications.
             </p>

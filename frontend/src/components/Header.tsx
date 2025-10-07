@@ -19,7 +19,11 @@ const Header = () => {
   return (
     <div className='bg-sky-500 w-full h-auto min-h-[70px] flex items-center justify-between px-3 py-2 fixed top-0 z-50'>
       <h1 className='text-4xl font-bold text-white'>Job API</h1>
-      <div className='h-full w-auto min-w-[150px] flex items-center gap-2'>
+      <div
+        className={`h-full w-auto ${
+          accessToken && 'min-w-[150px]'
+        } flex items-center gap-2`}
+      >
         <DarkModeToggle />
         {accessToken && (
           <>

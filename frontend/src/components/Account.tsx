@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAppDispatch } from '../app/store';
 import { setActiveView } from '../features/ui/uiSlice';
+import { RiArrowLeftLine } from '@remixicon/react';
 const Account = () => {
   const dispatch = useAppDispatch();
   return (
@@ -8,9 +9,10 @@ const Account = () => {
       <div className='flex justify-between'>
         Account
         <button
-          className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'
+          className='dark:text-white text-black px-3 py-1 rounded-md inline-flex items-center gap-1'
           onClick={() => dispatch(setActiveView('dashboard'))}
         >
+          <RiArrowLeftLine />
           Back
         </button>
       </div>
