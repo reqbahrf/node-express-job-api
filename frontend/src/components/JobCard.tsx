@@ -38,13 +38,13 @@ const JobCard = ({
     __v,
   };
   return (
-    <div className='bg-white rounded-lg shadow-md p-6 grid md:grid-cols-[2fr_2fr_auto] grid-cols-1 gap-4'>
+    <div className='bg-white dark:bg-gray-900 rounded-lg shadow-md p-6 grid md:grid-cols-[2fr_2fr_auto] grid-cols-1 gap-4'>
       <div>
         <h2 className='text-xl font-bold mb-2 border-b'>{position}</h2>
-        <p className='text-gray-600 mb-2'>{company}</p>
+        <p className='text-gray-600 dark:text-white mb-2'>{company}</p>
       </div>
       <div>
-        <p className='text-gray-600 mb-2'>
+        <p className='text-gray-600 dark:text-white mb-2'>
           Status:{' '}
           <span
             className={`text-white p-1 rounded-2xl ${

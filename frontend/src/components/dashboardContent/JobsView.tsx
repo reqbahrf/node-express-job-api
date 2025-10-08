@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, lazy } from 'react';
+import MainJobModal from '../modal/MainJobModal';
 const AddJobModal = lazy(() => import('../modal/AddJobModal'));
 import JobCard, { JobInfo } from '../JobCard';
 const UpdateJobModal = lazy(() => import('../modal/UpdateJobModal'));
 const DeleteJobModal = lazy(() => import('../modal/DeleteJobModal'));
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import jobAPI from '../../features/job/jobAPI';
-import Loading from '../Loading';
 import useSocket from '../../hooks/useSocket';
 import { RiAddLine } from '@remixicon/react';
 type ModalState =
@@ -40,7 +40,7 @@ const JobsView = () => {
     <>
       {' '}
       <div className='flex justify-between'>
-        <h1 className='md:text-4xl text-2xl mx-4 font-bold text-gray-900'>
+        <h1 className='md:text-4xl text-2xl mx-4 font-bold text-gray-900 dark:text-white'>
           Jobs
         </h1>
         <button
@@ -50,10 +50,12 @@ const JobsView = () => {
           <RiAddLine />
         </button>
       </div>
-      <div className='w-full h-full mt-4 sm:mx-[20px] bg-white rounded-lg shadow-lg overflow-y-scroll'>
+      <div className='w-full h-full mt-4 sm:mx-[20px] bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-y-scroll'>
         <div className='flex flex-col gap-4 p-4'>
           {jobs.length === 0 ? (
-            <p className='text-center text-gray-600'>No jobs found</p>
+            <p className='text-center text-gray-600 dark:text-white'>
+              No jobs found
+            </p>
           ) : (
             jobs.map((job) => (
               <JobCard
@@ -66,29 +68,43 @@ const JobsView = () => {
           )}
         </div>
       </div>
-      <Suspense fallback={<Loading />}>
-        {modal?.type === 'add' && (
-          <AddJobModal onClose={handleAfterModalActionJobs} />
-        )}
-        {modal?.type === 'update' && modal?.Job && (
+      {modal?.type === 'add' && (
+        <MainJobModal
+          title='Add Job'
+          headerColor='bg-blue-500'
+          onClose={handleAfterModalActionJobs}
+        >
+          <AddJobModal />
+        </MainJobModal>
+      )}
+      {modal?.type === 'update' && modal?.Job && (
+        <MainJobModal
+          title='Update Job'
+          headerColor='bg-blue-500'
+          onClose={handleAfterModalActionJobs}
+        >
           <UpdateJobModal
             jobID={modal.Job._id}
             company={modal.Job.company}
             position={modal.Job.position}
             status={modal.Job.status || ''}
-            onClose={handleAfterModalActionJobs}
           />
-        )}
-        {modal?.type === 'delete' && modal?.Job && (
+        </MainJobModal>
+      )}
+      {modal?.type === 'delete' && modal?.Job && (
+        <MainJobModal
+          title='Delete Job'
+          headerColor='bg-red-500'
+          onClose={handleAfterModalActionJobs}
+        >
           <DeleteJobModal
             jobID={modal?.Job._id}
             company={modal?.Job.company}
             position={modal?.Job.position}
             status={modal?.Job.status || ''}
-            onClose={handleAfterModalActionJobs}
           />
-        )}
-      </Suspense>
+        </MainJobModal>
+      )}
     </>
   );
 };

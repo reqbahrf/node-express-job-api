@@ -1,6 +1,4 @@
 import React, { useState } from 'react';
-import MainModal from './MainModal';
-import axios from 'axios';
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import { setLoading } from '../../features/loading/loadingSlice';
 import jobAPI from '../../features/job/jobAPI';
@@ -10,7 +8,7 @@ interface UpdateJobModalProps {
   company: string;
   status: string;
   position: string;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 const UpdateJobModal = (props: UpdateJobModalProps) => {
@@ -40,7 +38,7 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
 
     try {
       await dispatch(jobAPI.updateJob({ jobID, formData })).unwrap();
-      props.onClose();
+      props?.onClose?.();
     } catch (err) {
       console.error('Failed to update job:', err);
     } finally {
@@ -48,50 +46,44 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
     }
   };
   return (
-    <MainModal
-      title='Update Job'
-      headerColor='bg-sky-500'
-      onClose={props.onClose}
-    >
-      <form onSubmit={handleSubmit}>
-        <input
-          type='text'
-          name='company'
-          id='company'
-          value={formData.company}
-          onChange={handleChange}
-          placeholder='Company'
-          className='w-full p-2 mb-4 border border-gray-300 rounded'
-        />
-        <input
-          type='text'
-          name='position'
-          id='position'
-          value={formData.position}
-          onChange={handleChange}
-          placeholder='Position'
-          className='w-full p-2 mb-4 border border-gray-300 rounded'
-        />
-        <select
-          name='status'
-          id='status'
-          value={formData.status}
-          onChange={handleChange}
-          className='w-full p-2 mb-4 border border-gray-300 rounded'
-        >
-          <option value='pending'>Pending</option>
-          <option value='interview'>Interview</option>
-          <option value='declined'>declined</option>
-        </select>
-        <button
-          type='submit'
-          disabled={isLoading}
-          className='bg-blue-400 text-white px-4 py-2 rounded'
-        >
-          {isLoading ? 'Updating...' : 'Update'}
-        </button>
-      </form>
-    </MainModal>
+    <form onSubmit={handleSubmit}>
+      <input
+        type='text'
+        name='company'
+        id='company'
+        value={formData.company}
+        onChange={handleChange}
+        placeholder='Company'
+        className='w-full p-2 mb-4 border border-gray-300 rounded'
+      />
+      <input
+        type='text'
+        name='position'
+        id='position'
+        value={formData.position}
+        onChange={handleChange}
+        placeholder='Position'
+        className='w-full p-2 mb-4 border border-gray-300 rounded'
+      />
+      <select
+        name='status'
+        id='status'
+        value={formData.status}
+        onChange={handleChange}
+        className='w-full p-2 mb-4 border border-gray-300 rounded'
+      >
+        <option value='pending'>Pending</option>
+        <option value='interview'>Interview</option>
+        <option value='declined'>declined</option>
+      </select>
+      <button
+        type='submit'
+        disabled={isLoading}
+        className='bg-blue-400 text-white px-4 py-2 rounded'
+      >
+        {isLoading ? 'Updating...' : 'Update'}
+      </button>
+    </form>
   );
 };
 
