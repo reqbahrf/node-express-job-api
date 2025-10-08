@@ -1,4 +1,4 @@
-import React, { useState, memo } from 'react';
+import { useState, memo } from 'react';
 import authAPI from '../features/auth/authAPI';
 import defaultAvatar from '../assets/avatar-default-icon.png';
 import { useAppSelector } from '../app/store';

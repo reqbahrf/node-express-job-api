@@ -32,7 +32,7 @@ const authAPI = {
         );
         thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
         return data;
-      } catch (error) {
+      } catch (error: any) {
         return thunkAPI.rejectWithValue(
           error.response?.data?.message || 'Login failed'
         );
@@ -46,7 +46,7 @@ const authAPI = {
       await axios.post('/api/v1/auth/logout');
       thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
       return null;
-    } catch (error) {
+    } catch (error: any) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || 'Logout failed'
       );
@@ -88,7 +88,7 @@ const authAPI = {
       );
       thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
       return data;
-    } catch (error) {
+    } catch (error: any) {
       return thunkAPI.rejectWithValue(
         error.response?.data?.message || 'Refresh token failed'
       );

@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../../app/store';
 import jobAPI from '../../features/job/jobAPI';
 import Loading from '../Loading';
 import useSocket from '../../hooks/useSocket';
+import { RiAddLine } from '@remixicon/react';
 type ModalState =
   | {
       type: 'add' | 'update' | 'delete' | null;
@@ -18,7 +19,7 @@ const JobsView = () => {
   const dispatch = useAppDispatch();
   const jobs = useAppSelector((state) => state.job.jobs);
   const { userid, role } = useAppSelector((state) => state.auth);
-  const { isConnected, userCount } = useSocket(userid || '', role || '');
+  useSocket(userid || '', role || '');
   const [modal, setModal] = useState<ModalState>({ type: null, Job: null });
   const handleUpdateJobs = useCallback((job: JobInfo) => {
     setModal({ type: 'update', Job: job });
@@ -46,7 +47,7 @@ const JobsView = () => {
           className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'
           onClick={() => setModal({ type: 'add', Job: null })}
         >
-          Add Job
+          <RiAddLine />
         </button>
       </div>
       <div className='w-full h-full mt-4 sm:mx-[20px] bg-white rounded-lg shadow-lg overflow-y-scroll'>
