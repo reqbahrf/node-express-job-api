@@ -1,0 +1,17 @@
+import { ReactNode, Suspense } from 'react';
+import Loading from '../components/Loading';
+import Header from '@/components/Header';
+const AppLayout = ({ children }: { children: ReactNode }) => {
+  return (
+    <>
+      <Header />
+      <div className=' bg-white dark:bg-gray-700 min-h-screen flex justify-center'>
+        <div className='md:w-1/2 w-full h-[80vh] mt-[100px] sm:mx-[20px] dark:text-white'>
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default AppLayout;

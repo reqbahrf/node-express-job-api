@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import AuthFormContainer from '../components/AuthFormContainer';
+import AuthFormContainer from '../layout/AuthFormLayout';
 import { useNavigate } from 'react-router-dom';
 import authAPI from '../features/auth/authAPI';
 import { useAppDispatch, useAppSelector } from '../app/store';

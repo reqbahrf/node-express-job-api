@@ -1,14 +1,11 @@
 import React, { ReactNode } from 'react';
 
-interface AuthFormContainerProps {
+interface AuthFormLayoutProps {
   children: ReactNode;
   title?: string;
 }
 
-const AuthFormContainer: React.FC<AuthFormContainerProps> = ({
-  children,
-  title,
-}) => {
+const AuthFormLayout: React.FC<AuthFormLayoutProps> = ({ children, title }) => {
   return (
     <div className='min-h-screen flex items-center justify-center bg-white dark:bg-gray-700 py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-md w-full space-y-8 dark:bg-gray-800 p-8 rounded-lg shadow-md'>
@@ -25,4 +22,4 @@ const AuthFormContainer: React.FC<AuthFormContainerProps> = ({
   );
 };
 
-export default AuthFormContainer;
+export default AuthFormLayout;

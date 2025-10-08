@@ -1,9 +1,13 @@
 import { useState, useEffect, useCallback, lazy } from 'react';
-import MainJobModal from '../modal/MainJobModal';
-const AddJobModal = lazy(() => import('../modal/AddJobModal'));
-import JobCard, { JobInfo } from '../JobCard';
-const UpdateJobModal = lazy(() => import('../modal/UpdateJobModal'));
-const DeleteJobModal = lazy(() => import('../modal/DeleteJobModal'));
+import MainJobModal from '../../components/JobModal/MainJobModal';
+const AddJobModal = lazy(() => import('../../components/JobModal/AddJobModal'));
+import JobCard, { JobInfo } from '../../components/JobCard';
+const UpdateJobModal = lazy(
+  () => import('../../components/JobModal/UpdateJobModal')
+);
+const DeleteJobModal = lazy(
+  () => import('../../components/JobModal/DeleteJobModal')
+);
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import jobAPI from '../../features/job/jobAPI';
 import useSocket from '../../hooks/useSocket';

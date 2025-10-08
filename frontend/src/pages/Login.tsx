@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import AuthFormContainer from '../components/AuthFormContainer';
+import { useState } from 'react';
+import AuthFormContainer from '../layout/AuthFormLayout';
 import { Link, useNavigate } from 'react-router-dom';
 import authAPI from '../features/auth/authAPI';
 import { useAppDispatch } from '../app/store';

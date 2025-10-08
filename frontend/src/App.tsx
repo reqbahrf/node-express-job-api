@@ -1,4 +1,4 @@
-import React, { useEffect, Suspense, lazy } from 'react';
+import { useEffect, Suspense, lazy, ReactNode, ComponentType } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
@@ -14,14 +14,19 @@ import authAPI from './features/auth/authAPI';
 const Home = lazy(() => import('./pages/Home'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
+const JobsView = lazy(() => import('./pages/applicant/JobsView'));
+const AdminView = lazy(() => import('./pages/admin/AdminView'));
+const Account = lazy(() => import('./pages/Account'));
 import Loading from './components/Loading';
+import AppLayout from './layout/AppLayout';
 
-const titles = {
+const titles: Record<string, string> = {
   '/': 'Landing Page',
   '/login': 'Login',
   '/register': 'Register',
-  '/dashboard': 'Dashboard',
+  '/user/dashboard': 'Dashboard',
+  '/admin/dashboard': 'Admin Dashboard',
+  '/account': 'Account',
 };
 
 const TitleManager = () => {
@@ -44,10 +49,26 @@ const App = () => {
 };
 
 const AppContent = () => {
-  const { accessToken } = useAppSelector((state) => state.auth);
+  const { accessToken, role } = useAppSelector((state) => state.auth);
   const globalLoading = useAppSelector((state) => state.loading.globalLoading);
-
   const dispatch = useAppDispatch();
+
+  const withLayout = (
+    Layout: ComponentType<{ children: ReactNode }>,
+    page: ReactNode
+  ) => {
+    return (
+      <Layout>
+        <Suspense fallback={<Loading />}>
+          {accessToken ? page : <Navigate to='/login' />}
+        </Suspense>
+      </Layout>
+    );
+  };
+
+  const navigateToDashboard = () => {
+    return role === 'admin' ? '/admin/dashboard' : '/user/dashboard';
+  };
 
   useEffect(() => {
     dispatch(authAPI.refreshToken());
@@ -68,7 +89,11 @@ const AppContent = () => {
           path='/login'
           element={
             <Suspense fallback={<Loading />}>
-              {!accessToken ? <Login /> : <Navigate to='/dashboard' />}
+              {!accessToken ? (
+                <Login />
+              ) : (
+                <Navigate to={navigateToDashboard()} />
+              )}
             </Suspense>
           }
         />
@@ -76,17 +101,25 @@ const AppContent = () => {
           path='/register'
           element={
             <Suspense fallback={<Loading />}>
-              {!accessToken ? <Register /> : <Navigate to='/dashboard' />}
+              {!accessToken ? (
+                <Register />
+              ) : (
+                <Navigate to={navigateToDashboard()} />
+              )}
             </Suspense>
           }
         />
         <Route
-          path='/dashboard'
-          element={
-            <Suspense fallback={<Loading />}>
-              {accessToken ? <Dashboard /> : <Navigate to='/login' />}
-            </Suspense>
-          }
+          path='/user/dashboard'
+          element={withLayout(AppLayout, <JobsView />)}
+        />
+        <Route
+          path='/admin/dashboard'
+          element={withLayout(AppLayout, <AdminView />)}
+        />
+        <Route
+          path='/account'
+          element={withLayout(AppLayout, <Account />)}
         />
       </Routes>
     </>

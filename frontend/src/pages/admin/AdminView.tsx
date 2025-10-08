@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppSelector } from '../../app/store';
 import useSocket from '../../hooks/useSocket';
 import axios from 'axios';
@@ -37,12 +37,12 @@ const AdminView = () => {
   }, []);
   return (
     <>
-        Welcome back Admin {user}
-        <p>
-          Online Users:&nbsp;
-          <span className='bg-green-500 h-[10px] w-[10px] rounded-full inline-block mr-1'></span>
-          {userCount}/{stats.applicantUserCount}
-        </p>
+      Welcome back Admin {user}
+      <p>
+        Online Users:&nbsp;
+        <span className='bg-green-500 h-[10px] w-[10px] rounded-full inline-block mr-1'></span>
+        {userCount}/{stats.applicantUserCount}
+      </p>
     </>
   );
 };
