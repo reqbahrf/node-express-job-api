@@ -5,14 +5,20 @@ import { useAppSelector } from '../app/store';
 import { useAppDispatch } from '../app/store';
 import { setActiveView } from '../features/ui/uiSlice';
 import DarkModeToggle from './DarkModeToggle';
+import { useNavigate } from 'react-router-dom';
+import { RiCircleFill } from '@remixicon/react';
 const Header = () => {
   const [toggle, setToggle] = useState(false);
+  const activeView = useAppSelector((state) => state.ui.activeView);
   const { accessToken, user, role } = useAppSelector((state) => state.auth);
   const formattedRole = role
     ? role?.charAt(0).toUpperCase() + role?.slice(1)
     : '';
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const handleToggleAccount = () => {
+    if (activeView === 'account') return;
+    navigate('/account');
     dispatch(setActiveView('account'));
     setToggle(!toggle);
   };
@@ -41,7 +47,17 @@ const Header = () => {
                     className='w-full block px-4 py-2 hover:bg-gray-200'
                     onClick={handleToggleAccount}
                   >
-                    Account
+                    {activeView === 'account' ? (
+                      <span className='inline-block'>
+                        <RiCircleFill
+                          size={10}
+                          className='text-green-500'
+                        />
+                      </span>
+                    ) : (
+                      ''
+                    )}
+                    &nbsp;Account
                   </button>
                   <button
                     className='w-full block px-4 py-2 hover:bg-gray-200 text-red-500'

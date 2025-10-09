@@ -30,18 +30,17 @@ const logout = async (req: Request, res: Response) => {
   res.clearCookie('resToken');
   res.status(StatusCodes.OK).json({ message: 'User logged out' });
 };
+
 const register = async (req: Request, res: Response) => {
   const user = await User.create(req.body);
   const { accessToken, refreshToken } = user.createJWT();
   setTokenCookie(res, refreshToken);
-  res
-    .status(StatusCodes.CREATED)
-    .json({
-      userid: user._id,
-      username: user.name,
-      role: user.role,
-      accessToken,
-    });
+  res.status(StatusCodes.CREATED).json({
+    userid: user._id,
+    username: user.name,
+    role: user.role,
+    accessToken,
+  });
 };
 
 const refreshToken = async (req: Request, res: Response) => {
@@ -55,18 +54,15 @@ const refreshToken = async (req: Request, res: Response) => {
     const user = await User.findOne({ _id: decode.userId });
     if (!user) return;
     const accessToken = user.generateAccessToken();
-    res
-      .status(StatusCodes.OK)
-      .json({
-        userid: user._id,
-        username: user.name,
-        role: user.role,
-        accessToken,
-      });
+    res.status(StatusCodes.OK).json({
+      userid: user._id,
+      username: user.name,
+      role: user.role,
+      accessToken,
+    });
   } catch (error) {
     console.log(error);
     throw new UnauthenticatedError('Authentication invalid');
   }
 };
-
 export { login, register, logout, refreshToken };

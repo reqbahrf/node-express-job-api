@@ -27,9 +27,7 @@ const register = async (req, res) => {
     const user = await User.create(req.body);
     const { accessToken, refreshToken } = user.createJWT();
     setTokenCookie(res, refreshToken);
-    res
-        .status(StatusCodes.CREATED)
-        .json({
+    res.status(StatusCodes.CREATED).json({
         userid: user._id,
         username: user.name,
         role: user.role,
@@ -50,9 +48,7 @@ const refreshToken = async (req, res) => {
         if (!user)
             return;
         const accessToken = user.generateAccessToken();
-        res
-            .status(StatusCodes.OK)
-            .json({
+        res.status(StatusCodes.OK).json({
             userid: user._id,
             username: user.name,
             role: user.role,

@@ -17,6 +17,7 @@ const Register = lazy(() => import('./pages/Register'));
 const JobsView = lazy(() => import('./pages/applicant/JobsView'));
 const AdminView = lazy(() => import('./pages/admin/AdminView'));
 const Account = lazy(() => import('./pages/Account'));
+import { Toaster } from 'react-hot-toast';
 import Loading from './components/Loading';
 import AppLayout from './layout/AppLayout';
 
@@ -43,6 +44,7 @@ const App = () => {
     <Router>
       <Provider store={store}>
         <AppContent />
+        <Toaster />
       </Provider>
     </Router>
   );

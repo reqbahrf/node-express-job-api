@@ -27,6 +27,7 @@ import expressSanitizer from './middleware/expressSanitizer.js';
 import authRouter from './routes/auth.js';
 import jobRouter from './routes/jobs.js';
 import adminRouter from './routes/adminDashboard.js';
+import passwordRouter from './routes/password.js';
 
 // error handler
 import notFoundMiddleware from './middleware/not-found.js';
@@ -93,7 +94,8 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use('/api/v1/admin', authMiddleware, adminUser, adminRouter);
 // API routes
-app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/auth', expressSanitizer(), authRouter);
+app.use('/api/v1/password', authMiddleware, expressSanitizer(), passwordRouter);
 app.use('/api/v1/jobs', authMiddleware, expressSanitizer(), jobRouter);
 app.use(/^(?!\/api\/).*/, notFoundMiddleware);
 
