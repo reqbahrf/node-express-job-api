@@ -14,6 +14,7 @@ interface RegisterCredential extends Credentials {
 
 interface ResponseAuthData {
   userid: string;
+  email: string;
   username: string;
   role: string;
   accessToken: string;

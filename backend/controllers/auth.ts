@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 
 interface UserJwtPayload extends JwtPayload {
   userId: string;
+  email: string;
   username: string;
   role: string;
 }
@@ -22,9 +23,13 @@ const login = async (req: Request, res: Response) => {
   if (!isMatch) throw new UnauthenticatedError('Invalide credentials');
   const { accessToken, refreshToken } = user.createJWT();
   setTokenCookie(res, refreshToken);
-  res
-    .status(StatusCodes.OK)
-    .json({ username: user.name, role: user.role, accessToken });
+  res.status(StatusCodes.OK).json({
+    userid: user._id,
+    email: user.email,
+    username: user.name,
+    role: user.role,
+    accessToken,
+  });
 };
 const logout = async (req: Request, res: Response) => {
   res.clearCookie('resToken');
@@ -37,6 +42,7 @@ const register = async (req: Request, res: Response) => {
   setTokenCookie(res, refreshToken);
   res.status(StatusCodes.CREATED).json({
     userid: user._id,
+    email: user.email,
     username: user.name,
     role: user.role,
     accessToken,
@@ -56,6 +62,7 @@ const refreshToken = async (req: Request, res: Response) => {
     const accessToken = user.generateAccessToken();
     res.status(StatusCodes.OK).json({
       userid: user._id,
+      email: user.email,
       username: user.name,
       role: user.role,
       accessToken,

@@ -52,7 +52,12 @@ UserSchema.methods._generateJWT = function (
   lifetime: jwt.SignOptions['expiresIn']
 ): string {
   return jwt.sign(
-    { userId: this._id, username: this.name, role: this.role },
+    {
+      userId: this._id,
+      email: this.email,
+      username: this.name,
+      role: this.role,
+    },
     secret,
     {
       expiresIn: lifetime,

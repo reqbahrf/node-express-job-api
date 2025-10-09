@@ -54,7 +54,7 @@ const JobsView = () => {
           <RiAddLine />
         </button>
       </div>
-      <div className='w-full h-full mt-4 sm:mx-[20px] bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-y-scroll'>
+      <div className='w-full h-[90%] mt-4 sm:mx-[20px] bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-y-scroll'>
         <div className='flex flex-col gap-4 p-4'>
           {jobs.length === 0 ? (
             <p className='text-center text-gray-600 dark:text-white'>

@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import defaultAvatar from '../assets/avatar-default-icon.png';
 import { useAppSelector, useAppDispatch } from '../app/store';
 import { RiArrowLeftLine } from '@remixicon/react';
 import { setActiveView } from '@/features/ui/uiSlice';
@@ -6,6 +7,35 @@ import toast from 'react-hot-toast';
 import Input from '../components/Input';
 import { useState } from 'react';
 import axios from 'axios';
+const AccountInfoCard = () => {
+  const { user, email } = useAppSelector((state) => state.auth);
+  return (
+    <div className='w-full mx-auto mb-4'>
+      <div className='flex sm:flex-row flex-col bg-white dark:bg-gray-800 p-4 rounded-md mt-2 min-h-[30vh] px-8'>
+        <div className='flex justify-center sm:justify-start mb-4 sm:mb-0 sm:mr-6'>
+          <div className='border-2 dark:border-white border-black  rounded-full w-[200px] h-[200px] text-center overflow-hidden'>
+            <img
+              src={defaultAvatar}
+              className='w-full h-full object-cover'
+              alt='user profile'
+            />
+          </div>
+        </div>
+        <div className='flex justify-center lg:ms-20'>
+          <div className='flex flex-col items-center sm:justify-center w-full mb-8'>
+            <div className='flex'>
+              <span className='text-4xl'>{user}</span>
+            </div>
+            <div className='flex'>
+              <span className='text-md font-mono'>{email}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ChangePasswordCard = () => {
   const accessToken = useAppSelector((state) => state.auth.accessToken);
   const [changePass, setChangePass] = useState({
@@ -47,7 +77,7 @@ const ChangePasswordCard = () => {
     });
   };
   return (
-    <div className='w-full mx-auto mt-4'>
+    <div className='w-full mx-auto mb-4'>
       <h2 className='text-xl font-bold'>Change Password</h2>
       <div className='bg-white dark:bg-gray-800 p-4 rounded-md mt-2'>
         <form
@@ -135,6 +165,7 @@ const Account = () => {
         </button>
       </div>
       <hr />
+      <AccountInfoCard />
       <ChangePasswordCard />
     </>
   );

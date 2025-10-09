@@ -15,9 +15,13 @@ const login = async (req, res) => {
         throw new UnauthenticatedError('Invalide credentials');
     const { accessToken, refreshToken } = user.createJWT();
     setTokenCookie(res, refreshToken);
-    res
-        .status(StatusCodes.OK)
-        .json({ username: user.name, role: user.role, accessToken });
+    res.status(StatusCodes.OK).json({
+        userid: user._id,
+        email: user.email,
+        username: user.name,
+        role: user.role,
+        accessToken,
+    });
 };
 const logout = async (req, res) => {
     res.clearCookie('resToken');
@@ -29,6 +33,7 @@ const register = async (req, res) => {
     setTokenCookie(res, refreshToken);
     res.status(StatusCodes.CREATED).json({
         userid: user._id,
+        email: user.email,
         username: user.name,
         role: user.role,
         accessToken,
@@ -50,6 +55,7 @@ const refreshToken = async (req, res) => {
         const accessToken = user.generateAccessToken();
         res.status(StatusCodes.OK).json({
             userid: user._id,
+            email: user.email,
             username: user.name,
             role: user.role,
             accessToken,
