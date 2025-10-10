@@ -2,6 +2,7 @@ import { memo } from 'react';
 import ActiveAccount from './account/ActiveAccount';
 import { useAppSelector } from '../app/store';
 import DarkModeToggle from './DarkModeToggle';
+import NotificationIcon from './notification/notificationIcon';
 const Header = () => {
   const { accessToken, user, role } = useAppSelector((state) => state.auth);
   return (
@@ -14,10 +15,13 @@ const Header = () => {
       >
         <DarkModeToggle />
         {accessToken && (
-          <ActiveAccount
-            user={user || 'Guest'}
-            role={role || 'Guest'}
-          />
+          <>
+            <NotificationIcon />
+            <ActiveAccount
+              user={user || 'Guest'}
+              role={role || 'Guest'}
+            />
+          </>
         )}
       </div>
     </div>
