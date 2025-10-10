@@ -71,7 +71,7 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
         id='status'
         value={formData.status}
         onChange={handleChange}
-        className='w-full p-2 mb-4 border border-gray-300 rounded'
+        className='w-full p-2 mb-4 border bg-white text-black border-gray-300 dark:text-white rounded dark:bg-gray-800'
       >
         <option value='pending'>Pending</option>
         <option value='interview'>Interview</option>

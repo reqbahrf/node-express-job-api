@@ -65,7 +65,7 @@ const JobCard = ({
           Updated: {new Date(updatedAt).toLocaleString()}
         </p>
       </div>
-      <div className='flex flex-col gap-2 justify-center mx-4'>
+      <div className='flex flex-col gap-2 justify-center'>
         <button
           onClick={() => onUpdate(jobInfo)}
           className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'

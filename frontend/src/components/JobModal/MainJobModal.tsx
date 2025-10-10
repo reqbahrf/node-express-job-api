@@ -1,4 +1,5 @@
-import React, { ReactElement, cloneElement, Suspense } from 'react';
+import { ReactElement, cloneElement, Suspense } from 'react';
+import { RiCloseLine } from '@remixicon/react';
 interface ModalProps<T = any> {
   children: ReactElement<T>;
   title: string;
@@ -29,7 +30,7 @@ const MainJobModal = (props: ModalProps) => {
             onClick={onClose}
             className='modal-close font-extrabold text-gray-600 dark:text-white hover:text-gray-900 '
           >
-            x
+            <RiCloseLine />
           </button>
         </div>
         <div className='modal-body p-4 '>
