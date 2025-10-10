@@ -4,9 +4,6 @@ import express from 'express';
 const app = express();
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
-
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -33,34 +30,6 @@ import passwordRouter from './routes/password.js';
 import notFoundMiddleware from './middleware/not-found.js';
 import errorHandlerMiddleware from './middleware/error-handler.js';
 
-const onlineUsers = new Map();
-const server = createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: 'http://localhost:5173',
-    credentials: true,
-  },
-});
-
-io.on('connection', (socket) => {
-  socket.on('join', (userid) => {
-    onlineUsers.set(userid, socket.id);
-    io.emit('rt-user-count', onlineUsers.size);
-  });
-  socket.on('disconnect', () => {
-    for (let [userId, socketId] of onlineUsers.entries()) {
-      if (socketId === socket.id) {
-        onlineUsers.delete(userId);
-        break;
-      }
-    }
-    io.emit('rt-user-count', onlineUsers.size);
-  });
-  socket.on('leave', (userid) => {
-    onlineUsers.delete(userid);
-    io.emit('rt-user-count', onlineUsers.size);
-  });
-});
 // extra packages
 app.set('trust proxy', 1);
 // app.use(
@@ -102,19 +71,4 @@ app.use(/^(?!\/api\/).*/, notFoundMiddleware);
 // Error handling
 app.use(errorHandlerMiddleware);
 
-const port = process.env.PORT || 3000;
-
-const start = async () => {
-  try {
-    const secret = process.env.MONGO_URI;
-    if (!secret) throw new Error('Mongo URI not found');
-    await connectDB(secret);
-    server.listen(port, () =>
-      console.log(`Server is listening on port ${port}...`)
-    );
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-start();
+export default app;

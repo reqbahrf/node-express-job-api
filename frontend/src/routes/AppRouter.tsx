@@ -16,6 +16,9 @@ const AdminView = lazy(() => import('../pages/admin/AdminView'));
 const Account = lazy(() => import('../pages/Account'));
 import Loading from '../components/Loading';
 import AppLayout from '../layout/AppLayout';
+import navigateToDashboard from '../utils/navigateToDashboard';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import { ROLES } from '@/constant/roles';
 
 const AppRouter = () => {
   const { accessToken, role } = useAppSelector((state) => state.auth);
@@ -28,10 +31,6 @@ const AppRouter = () => {
   ) => {
     if (!accessToken) return <Navigate to='/login' />;
     return <Layout>{page}</Layout>;
-  };
-
-  const navigateToDashboard = () => {
-    return role === 'admin' ? '/admin/dashboard' : '/user/dashboard';
   };
 
   useEffect(() => {
@@ -55,7 +54,10 @@ const AppRouter = () => {
               {!accessToken ? (
                 <Login />
               ) : (
-                <Navigate to={navigateToDashboard()} />
+                <Navigate
+                  to={navigateToDashboard(role || '')}
+                  replace
+                />
               )}
             </Suspense>
           }
@@ -67,22 +69,34 @@ const AppRouter = () => {
               {!accessToken ? (
                 <Register />
               ) : (
-                <Navigate to={navigateToDashboard()} />
+                <Navigate to={navigateToDashboard(role || '')} />
               )}
             </Suspense>
           }
         />
         <Route
           path='/user/dashboard'
-          element={withLayout(AppLayout, <JobsView />)}
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.APPLICANT]}>
+              {withLayout(AppLayout, <JobsView />)}
+            </ProtectedRoute>
+          }
         />
         <Route
           path='/admin/dashboard'
-          element={withLayout(AppLayout, <AdminView />)}
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+              {withLayout(AppLayout, <AdminView />)}
+            </ProtectedRoute>
+          }
         />
         <Route
           path='/account'
-          element={withLayout(AppLayout, <Account />)}
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.APPLICANT]}>
+              {withLayout(AppLayout, <Account />)}
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </>

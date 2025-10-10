@@ -5,9 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import authAPI from '../features/auth/authAPI';
 import { useAppDispatch, useAppSelector } from '../app/store';
 import Header from '../components/Header';
+import navigateToDashboard from '../utils/navigateToDashboard';
 
 const Register = () => {
   const dispatch = useAppDispatch();
+  const role = useAppSelector((state) => state.auth.role);
   const navigate = useNavigate();
   const { registerError } = useAppSelector((state) => state.auth);
   const [formData, setformData] = useState({
@@ -28,7 +30,7 @@ const Register = () => {
     e.preventDefault();
     const resultAction = await dispatch(authAPI.register(formData));
     if (authAPI.register.fulfilled.match(resultAction)) {
-      navigate('/dashboard');
+      navigate(navigateToDashboard(role || ''));
     }
   };
 

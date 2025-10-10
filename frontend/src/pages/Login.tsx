@@ -2,12 +2,14 @@ import { useState } from 'react';
 import AuthFormContainer from '../layout/AuthFormLayout';
 import { Link, useNavigate } from 'react-router-dom';
 import authAPI from '../features/auth/authAPI';
-import { useAppDispatch } from '../app/store';
+import { useAppDispatch, useAppSelector } from '../app/store';
 import Header from '../components/Header';
+import navigateToDashboard from '../utils/navigateToDashboard';
 
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const role = useAppSelector((state) => state.auth.role);
   const [formData, setformData] = useState({
     email: '',
     password: '',
@@ -24,7 +26,7 @@ const Login = () => {
     e.preventDefault();
     const resultAction = await dispatch(authAPI.login(formData));
     if (authAPI.login.fulfilled.match(resultAction)) {
-      navigate('/dashboard');
+      navigate(navigateToDashboard(role || ''));
     }
   };
 
