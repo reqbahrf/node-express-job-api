@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import { setLoading } from '../../features/loading/loadingSlice';
+import toast from 'react-hot-toast';
 import jobAPI from '../../features/job/jobAPI';
 const AddJobModal = (props: { onClose?: () => void }) => {
   const dispatch = useAppDispatch();
@@ -26,8 +27,9 @@ const AddJobModal = (props: { onClose?: () => void }) => {
     try {
       await dispatch(jobAPI.createNewJob(formData)).unwrap();
       props?.onClose?.();
+      toast.success('Job added successfully');
     } catch (err) {
-      console.error('Failed to add job:', err);
+      toast.error(`Failed to add job: ${err}`);
     } finally {
       dispatch(setLoading({ ...dispatchPayload, loading: false }));
     }

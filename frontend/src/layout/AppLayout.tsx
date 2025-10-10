@@ -1,6 +1,6 @@
 import { ReactNode, Suspense } from 'react';
-import Loading from '../components/Loading';
 import Header from '@/components/Header';
+import Loading from '@/components/Loading';
 const AppLayout = ({ children }: { children: ReactNode }) => {
   return (
     <>

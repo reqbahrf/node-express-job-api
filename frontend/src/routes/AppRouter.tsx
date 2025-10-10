@@ -26,13 +26,8 @@ const AppRouter = () => {
     Layout: ComponentType<{ children: ReactNode }>,
     page: ReactNode
   ) => {
-    return (
-      <Layout>
-        <Suspense fallback={<Loading />}>
-          {accessToken ? page : <Navigate to='/login' />}
-        </Suspense>
-      </Layout>
-    );
+    if (!accessToken) return <Navigate to='/login' />;
+    return <Layout>{page}</Layout>;
   };
 
   const navigateToDashboard = () => {

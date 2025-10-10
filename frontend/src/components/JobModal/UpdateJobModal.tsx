@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import { setLoading } from '../../features/loading/loadingSlice';
 import jobAPI from '../../features/job/jobAPI';
-
+import toast from 'react-hot-toast';
 interface UpdateJobModalProps {
   jobID: string;
   company: string;
@@ -39,8 +39,9 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
     try {
       await dispatch(jobAPI.updateJob({ jobID, formData })).unwrap();
       props?.onClose?.();
+      toast.success('Job updated successfully');
     } catch (err) {
-      console.error('Failed to update job:', err);
+      toast.error(`Failed to update job: ${err}`);
     } finally {
       dispatch(setLoading({ ...dispatchPayload, loading: false }));
     }

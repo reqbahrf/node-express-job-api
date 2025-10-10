@@ -1,7 +1,7 @@
-import React from 'react';
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import { setLoading } from '../../features/loading/loadingSlice';
 import jobAPI from '../../features/job/jobAPI';
+import toast from 'react-hot-toast';
 interface DeleteJobModalProps {
   jobID: string;
   company: string;
@@ -20,9 +20,10 @@ const DeleteJobModal = (props: DeleteJobModalProps) => {
     dispatch(setLoading(dispatchPayload));
     try {
       await dispatch(jobAPI.deleleJob(JobId));
+      toast.success('Job deleted successfully');
       onClose?.();
     } catch (error) {
-      console.log(error);
+      toast.error(`Failed to delete job: ${error}`);
     } finally {
       dispatch(setLoading({ ...dispatchPayload, loading: false }));
     }
