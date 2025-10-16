@@ -32,7 +32,7 @@ const AccountDropDown = ({
   };
   return (
     <>
-      <div className='absolute top-[110%] right-[0] mt-4 w-60 rounded-md bg-white py-2 shadow-lg dark:bg-gray-800'>
+      <div className='absolute top-[110%] right-[-15px] mt-4 w-60 rounded-md bg-white py-2 shadow-lg dark:bg-gray-800'>
         <div className='mb-4 flex-col justify-center'>
           <div className='text-dark ps-2 text-center dark:text-white'>
             {formattedRole}
