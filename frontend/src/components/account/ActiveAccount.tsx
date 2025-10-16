@@ -8,32 +8,26 @@ type ActiveAccountProps = {
 
 const ActiveAccount = ({ user, role }: ActiveAccountProps) => {
   const [toggleDropdown, setToggleDropdown] = useState(false);
-  const formattedRole = role
-    ? role?.charAt(0).toUpperCase() + role?.slice(1)
-    : '';
   return (
     <>
-      <div className='relative'>
-        <div className='md:h-[40px] md:w-[40px] h-[30px] w-[30px] border border-amber-50 rounded-full shadow-lg overflow-hidden'>
+      <div
+        className='relative'
+        onClick={() => setToggleDropdown(!toggleDropdown)}
+      >
+        <div className='h-[30px] w-[30px] overflow-hidden rounded-full border border-amber-50 shadow-lg md:h-[40px] md:w-[40px]'>
           <img
             src={defaultAvatar}
             alt='default avatar'
-            className='w-full h-full object-cover'
+            className='h-full w-full object-cover'
           />
         </div>
         {toggleDropdown && (
-          <AccountDropDown setToggleDropdown={setToggleDropdown} />
+          <AccountDropDown
+            setToggleDropdown={setToggleDropdown}
+            user={user}
+            role={role}
+          />
         )}
-      </div>
-      <div className='flex-col justify-center'>
-        <button
-          type='button'
-          className='text-2xl font-bold text-black ps-2'
-          onClick={() => setToggleDropdown(!toggleDropdown)}
-        >
-          {user}
-        </button>
-        <div className='text-center text-black ps-2'>{formattedRole}</div>
       </div>
     </>
   );

@@ -3,14 +3,26 @@ import { setActiveView } from '@/features/ui/uiSlice';
 import authAPI from '@/features/auth/authAPI';
 import { RiCircleFill } from '@remixicon/react';
 import { useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 
 interface AccountDropDownProps {
   setToggleDropdown: (value: boolean) => void;
+  user: string;
+  role: string;
 }
-const AccountDropDown = ({ setToggleDropdown }: AccountDropDownProps) => {
+const AccountDropDown = ({
+  setToggleDropdown,
+  user,
+  role,
+}: AccountDropDownProps) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const activeView = useAppSelector((state) => state.ui.activeView);
+
+  const formattedRole = useMemo(
+    () => (role ? role?.charAt(0).toUpperCase() + role?.slice(1) : ''),
+    [role],
+  );
 
   const handleToggleAccount = () => {
     if (activeView === 'account') return;
@@ -20,17 +32,23 @@ const AccountDropDown = ({ setToggleDropdown }: AccountDropDownProps) => {
   };
   return (
     <>
-      <div className='absolute right-[-20] top-[110%] w-40 mt-4 py-2 bg-white dark:bg-gray-800 rounded-md shadow-lg'>
+      <div className='absolute top-[110%] right-[0] mt-4 w-60 rounded-md bg-white py-2 shadow-lg dark:bg-gray-800'>
+        <div className='mb-4 flex-col justify-center'>
+          <div className='text-dark ps-2 text-center dark:text-white'>
+            {formattedRole}
+          </div>
+          <div className='text-dark ps-2 text-center text-2xl font-bold dark:text-white'>
+            {user}
+          </div>
+        </div>
+        <hr className='border-gray-200 dark:border-gray-600' />
         <button
-          className='w-full block px-4 py-2 hover:bg-gray-200 text-black dark:text-white dark:hover:bg-gray-600'
+          className='block w-full px-4 py-2 text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-600'
           onClick={handleToggleAccount}
         >
           {activeView === 'account' ? (
             <span className='inline-block'>
-              <RiCircleFill
-                size={10}
-                className='text-green-500'
-              />
+              <RiCircleFill size={10} className='text-green-500' />
             </span>
           ) : (
             ''
@@ -38,7 +56,7 @@ const AccountDropDown = ({ setToggleDropdown }: AccountDropDownProps) => {
           &nbsp;Account
         </button>
         <button
-          className='w-full block px-4 py-2 hover:bg-gray-200 dark:hover:bg-gray-600 text-red-500'
+          className='block w-full px-4 py-2 text-red-500 hover:bg-gray-200 dark:hover:bg-gray-600'
           onClick={() => dispatch(authAPI.logout())}
         >
           Logout
