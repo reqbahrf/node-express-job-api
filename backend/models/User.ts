@@ -31,7 +31,7 @@ const UserSchema = new mongoose.Schema<IUser>({
   },
   role: {
     type: String,
-    enum: ['applicant', 'admin'],
+    enum: ['applicant', 'admin', 'employer'],
     default: 'applicant',
   },
   password: {
@@ -49,7 +49,7 @@ UserSchema.pre('save', async function (): Promise<void> {
 
 UserSchema.methods._generateJWT = function (
   secret: jwt.Secret,
-  lifetime: jwt.SignOptions['expiresIn']
+  lifetime: jwt.SignOptions['expiresIn'],
 ): string {
   return jwt.sign(
     {
@@ -61,21 +61,21 @@ UserSchema.methods._generateJWT = function (
     secret,
     {
       expiresIn: lifetime,
-    }
+    },
   );
 };
 
 UserSchema.methods.generateAccessToken = function (): string {
   return this._generateJWT(
     process.env.JWT_ACCESS_SECRET,
-    process.env.JWT_ACCESS_LIFETIME
+    process.env.JWT_ACCESS_LIFETIME,
   );
 };
 
 UserSchema.methods.generateRefreshToken = function (): string {
   return this._generateJWT(
     process.env.JWT_REFRESH_SECRET,
-    process.env.JWT_REFRESH_LIFETIME
+    process.env.JWT_REFRESH_LIFETIME,
   );
 };
 
@@ -90,7 +90,7 @@ UserSchema.methods.createJWT = function (): {
 };
 
 UserSchema.methods.comparePassword = async function (
-  userProvidedPassword: string
+  userProvidedPassword: string,
 ): Promise<boolean> {
   const isMatch = await bcrypt.compare(userProvidedPassword, this.password);
   return isMatch;

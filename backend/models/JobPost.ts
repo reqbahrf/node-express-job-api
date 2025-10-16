@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const JobOpeningSchema = new mongoose.Schema(
+const JobPostSchema = new mongoose.Schema(
   {
     employerId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -64,7 +64,7 @@ const JobOpeningSchema = new mongoose.Schema(
         },
         status: {
           type: String,
-          enum: ['pending', 'shortlisted', 'hired', 'rejected'],
+          enum: ['pending', 'viewed', 'shortlisted', 'hired', 'rejected'],
           default: 'pending',
         },
       },
@@ -73,4 +73,4 @@ const JobOpeningSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-export default mongoose.model('JobOpening', JobOpeningSchema);
+export default mongoose.model('JobPost', JobPostSchema);
