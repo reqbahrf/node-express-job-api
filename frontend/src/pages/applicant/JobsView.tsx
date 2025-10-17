@@ -1,12 +1,14 @@
 import { useState, useEffect, useCallback, lazy } from 'react';
-import MainJobModal from '../../components/JobModal/MainJobModal';
-const AddJobModal = lazy(() => import('../../components/JobModal/AddJobModal'));
+import MainJobModal from '../../components/Modal';
+const AddJobModal = lazy(
+  () => import('../../components/JobModalContent/AddJobModal'),
+);
 import JobCard, { JobInfo } from '../../components/JobCard';
 const UpdateJobModal = lazy(
-  () => import('../../components/JobModal/UpdateJobModal')
+  () => import('../../components/JobModalContent/UpdateJobModal'),
 );
 const DeleteJobModal = lazy(
-  () => import('../../components/JobModal/DeleteJobModal')
+  () => import('../../components/JobModalContent/DeleteJobModal'),
 );
 import { useAppDispatch, useAppSelector } from '../../app/store';
 import jobAPI from '../../features/job/jobAPI';
@@ -43,17 +45,17 @@ const JobsView = () => {
   return (
     <>
       <div className='flex justify-between'>
-        <h1 className='md:text-4xl text-2xl mx-4 font-bold text-gray-900 dark:text-white'>
+        <h1 className='mx-4 text-2xl font-bold text-gray-900 md:text-4xl dark:text-white'>
           Jobs
         </h1>
         <button
-          className='bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600'
+          className='rounded-md bg-blue-500 px-3 py-1 text-white hover:bg-blue-600'
           onClick={() => setModal({ type: 'add', Job: null })}
         >
           <RiAddLine />
         </button>
       </div>
-      <div className='h-[90%] mt-4 sm:mx-[20px] bg-white dark:bg-gray-800 rounded-lg shadow-lg'>
+      <div className='mt-4 h-[90%] rounded-lg bg-white shadow-lg sm:mx-[20px] dark:bg-gray-800'>
         <div className='flex flex-col gap-y-4 p-4'>
           {jobs.length === 0 ? (
             <p className='text-center text-gray-600 dark:text-white'>

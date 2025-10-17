@@ -6,7 +6,7 @@ interface ModalProps<T = any> {
   headerColor: string;
   onClose: () => void;
 }
-const MainJobModal = (props: ModalProps) => {
+const Modal = (props: ModalProps) => {
   const { children, title, headerColor, onClose } = props;
 
   const cloneChildren = cloneElement(children, { onClose });
@@ -19,21 +19,21 @@ const MainJobModal = (props: ModalProps) => {
       aria-modal='true'
     >
       <div className='modal-overlay absolute inset-0 bg-gray-900 opacity-50' />
-      <div className='modal-container bg-white dark:bg-gray-800 md:w-1/3 w-full mx-auto rounded-2xl shadow-lg z-50 pb-4'>
+      <div className='modal-container z-50 mx-auto w-full rounded-2xl bg-white pb-4 shadow-lg md:w-1/3 dark:bg-gray-800'>
         <div
-          className={`flex justify-between items-center p-4 ${headerColor} rounded-t-2xl`}
+          className={`flex items-center justify-between p-4 ${headerColor} rounded-t-2xl`}
         >
           <h2 className='text-lg font-bold text-white dark:text-white'>
             {title}
           </h2>
           <button
             onClick={onClose}
-            className='modal-close font-extrabold text-gray-600 dark:text-white hover:text-gray-900 '
+            className='modal-close font-extrabold text-gray-600 hover:text-gray-900 dark:text-white'
           >
             <RiCloseLine />
           </button>
         </div>
-        <div className='modal-body p-4 '>
+        <div className='modal-body p-4'>
           {
             <Suspense
               fallback={
@@ -49,4 +49,4 @@ const MainJobModal = (props: ModalProps) => {
   );
 };
 
-export default MainJobModal;
+export default Modal;
