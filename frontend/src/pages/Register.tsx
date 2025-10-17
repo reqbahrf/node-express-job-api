@@ -169,37 +169,37 @@ const Register = () => {
             </Link>
           </div>
         </form>
-        {showConfirmModal && (
-          <Modal
-            title='Confirm Submission'
-            headerColor='bg-blue-500'
-            onClose={() => setShowConfirmModal(false)}
-          >
-            <div>
-              <p className='p-4 text-center text-lg text-black dark:text-white'>
-                Are you sure you want to register this account with a role of{' '}
-                <span className='font-bold'>{formData.role}</span>?
-              </p>
-              <div className='flex justify-center gap-4'>
-                <button
-                  type='button'
-                  onClick={() => setShowConfirmModal(false)}
-                  className='text-black dark:text-white'
-                >
-                  Cancel
-                </button>
-                <button
-                  type='button'
-                  onClick={() => submitForm()}
-                  className='rounded bg-blue-600 px-4 py-2 text-white'
-                >
-                  Submit
-                </button>
-              </div>
-            </div>
-          </Modal>
-        )}
       </AuthFormContainer>
+      {showConfirmModal && (
+        <Modal
+          title='Confirm Submission'
+          headerColor='bg-blue-500'
+          onClose={() => setShowConfirmModal(false)}
+        >
+          <div>
+            <p className='p-4 text-center text-lg text-black dark:text-white'>
+              Are you sure you want to register this account with a role of{' '}
+              <span className='font-bold'>{formData.role}</span>?
+            </p>
+            <div className='flex justify-center gap-4'>
+              <button
+                type='button'
+                onClick={() => setShowConfirmModal(false)}
+                className='text-black dark:text-white'
+              >
+                Cancel
+              </button>
+              <button
+                type='button'
+                onClick={() => submitForm()}
+                className='rounded bg-blue-600 px-4 py-2 text-white'
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 };

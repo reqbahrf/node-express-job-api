@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { RiSunFill, RiMoonFill } from '@remixicon/react';
 
 const DarkModeToggle = () => {
   const [darkMode, setDarkMode] = useState(() => {
@@ -23,9 +24,13 @@ const DarkModeToggle = () => {
   return (
     <button
       onClick={() => setDarkMode((prev) => !prev)}
-      className='p-2 rounded-full bg-gray-200 dark:bg-gray-700'
+      className='rounded-full p-2'
     >
-      {darkMode ? '☀️' : '🌙'}
+      {darkMode ? (
+        <RiSunFill className='text-white' />
+      ) : (
+        <RiMoonFill className='text-black' />
+      )}
     </button>
   );
 };

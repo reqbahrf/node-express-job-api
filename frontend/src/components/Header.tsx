@@ -6,7 +6,7 @@ import NotificationIcon from './notification/NotificationIcon';
 const Header = () => {
   const { accessToken, user, role } = useAppSelector((state) => state.auth);
   return (
-    <div className='fixed top-0 z-50 flex h-auto min-h-[70px] w-full items-center justify-between bg-white px-4 py-2 shadow-sm md:px-8 dark:border-b-white dark:bg-gray-800'>
+    <div className='fixed top-0 z-50 flex h-auto min-h-[70px] w-full items-center justify-between px-4 py-2 md:px-8'>
       <h1 className='text-4xl font-bold text-black dark:text-white'>Job API</h1>
       <div
         className={`h-full w-auto ${
