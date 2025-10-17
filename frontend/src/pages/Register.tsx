@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../app/store';
 import Header from '../components/Header';
 import Input from '../components/Input';
 import navigateToDashboard from '../utils/navigateToDashboard';
+import Modal from '@/components/Modal';
 
 const Register = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +21,8 @@ const Register = () => {
     confirmPassword: '',
     role: 'applicant',
   });
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setformData({
@@ -37,12 +40,16 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setShowConfirmModal(true);
+  };
+
+  const submitForm = async () => {
     const resultAction = await dispatch(authAPI.register(formData));
+    setShowConfirmModal(false);
     if (authAPI.register.fulfilled.match(resultAction)) {
       navigate(navigateToDashboard(role || ''));
     }
   };
-
   return (
     <>
       <Header />
@@ -141,7 +148,6 @@ const Register = () => {
               </button>
             </div>
           </div>
-
           <div>
             <button
               type='submit'
@@ -163,6 +169,36 @@ const Register = () => {
             </Link>
           </div>
         </form>
+        {showConfirmModal && (
+          <Modal
+            title='Confirm Submission'
+            headerColor='bg-blue-500'
+            onClose={() => setShowConfirmModal(false)}
+          >
+            <div>
+              <p className='p-4 text-center text-lg text-black dark:text-white'>
+                Are you sure you want to register this account with a role of{' '}
+                <span className='font-bold'>{formData.role}</span>?
+              </p>
+              <div className='flex justify-center gap-4'>
+                <button
+                  type='button'
+                  onClick={() => setShowConfirmModal(false)}
+                  className='text-black dark:text-white'
+                >
+                  Cancel
+                </button>
+                <button
+                  type='button'
+                  onClick={() => submitForm()}
+                  className='rounded bg-blue-600 px-4 py-2 text-white'
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </Modal>
+        )}
       </AuthFormContainer>
     </>
   );
