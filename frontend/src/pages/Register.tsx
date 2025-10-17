@@ -18,12 +18,20 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    role: 'applicant',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setformData({
       ...formData,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleRoleToggle = (role: 'applicant' | 'employer') => {
+    setformData({
+      ...formData,
+      role,
     });
   };
 
@@ -40,7 +48,7 @@ const Register = () => {
       <Header />
       <AuthFormContainer title='Register'>
         <form className='mt-8 space-y-6' onSubmit={handleSubmit}>
-          <div className='-space-y-px rounded-md shadow-sm'>
+          <div className='-space-y-px rounded-md'>
             <div>
               <label htmlFor='name' className='sr-only'>
                 Full Name
@@ -104,6 +112,33 @@ const Register = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
               />
+            </div>
+            <h2 className='my-4 text-center text-lg font-bold text-gray-900 dark:text-white'>
+              Role
+            </h2>
+            <div className='flex justify-center gap-4 pb-4'>
+              <button
+                type='button'
+                onClick={() => handleRoleToggle('applicant')}
+                className={`rounded px-4 py-2 ${
+                  formData.role === 'applicant'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                Applicant
+              </button>
+              <button
+                type='button'
+                onClick={() => handleRoleToggle('employer')}
+                className={`rounded px-4 py-2 ${
+                  formData.role === 'employer'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-700'
+                }`}
+              >
+                Employer
+              </button>
             </div>
           </div>
 
