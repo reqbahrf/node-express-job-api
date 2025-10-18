@@ -6,11 +6,11 @@ import NotificationIcon from './notification/NotificationIcon';
 const Header = () => {
   const { accessToken, user, role } = useAppSelector((state) => state.auth);
   return (
-    <div className='fixed top-0 z-50 flex h-auto min-h-[70px] w-full items-center justify-between px-4 py-2 md:px-8'>
+    <div className='fixed top-0 z-50 flex h-auto min-h-[70px] w-full items-center justify-between py-2 ps-4 md:px-8'>
       <h1 className='text-4xl font-bold text-black dark:text-white'>Job API</h1>
       <div
         className={`h-full w-auto ${
-          accessToken && 'min-w-[150px]'
+          accessToken && 'min-w-[100px]'
         } flex items-center gap-2`}
       >
         <DarkModeToggle />

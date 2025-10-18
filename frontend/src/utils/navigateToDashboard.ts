@@ -1,5 +1,14 @@
 const navigateToDashboard = (role: string) => {
-  return role === 'admin' ? '/admin/dashboard' : '/user/dashboard';
+  switch (role) {
+    case 'admin':
+      return '/admin/dashboard';
+    case 'employer':
+      return '/employer/dashboard';
+    case 'applicant':
+      return '/applicant/dashboard';
+    default:
+      return '/user/dashboard';
+  }
 };
 
 export default navigateToDashboard;

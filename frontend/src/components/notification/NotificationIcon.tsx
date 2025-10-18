@@ -1,4 +1,4 @@
-import { RiNotificationLine } from '@remixicon/react';
+import { RiNotificationFill } from '@remixicon/react';
 import { useState } from 'react';
 import NotificationDropdown from './NotificationDropdown';
 const NotificationIcon = () => {
@@ -9,11 +9,8 @@ const NotificationIcon = () => {
   };
   return (
     <div className='relative'>
-      <button
-        onClick={handleNotificationClick}
-        className='p-2 rounded-full bg-gray-200 dark:bg-gray-700'
-      >
-        <RiNotificationLine className='text-black dark:text-white hover:text-blue-500' />
+      <button onClick={handleNotificationClick} className='py-2'>
+        <RiNotificationFill className='text-black dark:text-white' />
       </button>
       {showNotification && <NotificationDropdown />}
     </div>

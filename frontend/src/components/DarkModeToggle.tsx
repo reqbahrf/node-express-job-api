@@ -22,10 +22,7 @@ const DarkModeToggle = () => {
   }, [darkMode]);
 
   return (
-    <button
-      onClick={() => setDarkMode((prev) => !prev)}
-      className='rounded-full p-2'
-    >
+    <button onClick={() => setDarkMode((prev) => !prev)} className='py-2'>
       {darkMode ? (
         <RiSunFill className='text-white' />
       ) : (

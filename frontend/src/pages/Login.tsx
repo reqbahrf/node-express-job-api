@@ -5,6 +5,7 @@ import authAPI from '../features/auth/authAPI';
 import { useAppDispatch, useAppSelector } from '../app/store';
 import Header from '../components/Header';
 import navigateToDashboard from '../utils/navigateToDashboard';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -27,6 +28,9 @@ const Login = () => {
     const resultAction = await dispatch(authAPI.login(formData));
     if (authAPI.login.fulfilled.match(resultAction)) {
       navigate(navigateToDashboard(role || ''));
+    } else if (authAPI.login.rejected.match(resultAction)) {
+      const error = (resultAction.payload as string) || 'Something went wrong';
+      toast.error('Login failed: ' + error);
     }
   };
 
@@ -34,16 +38,10 @@ const Login = () => {
     <>
       <Header />
       <AuthFormContainer title='Login'>
-        <form
-          className='mt-8 space-y-6'
-          onSubmit={handleSubmit}
-        >
-          <div className='rounded-md shadow-sm space-y-px'>
+        <form className='mt-8 space-y-6' onSubmit={handleSubmit}>
+          <div className='space-y-px rounded-md shadow-sm'>
             <div>
-              <label
-                htmlFor='email'
-                className='sr-only'
-              >
+              <label htmlFor='email' className='sr-only'>
                 Email address
               </label>
               <input
@@ -51,17 +49,14 @@ const Login = () => {
                 name='email'
                 type='email'
                 required
-                className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:border-gray-600 dark:placeholder-gray-400 dark:text-white'
+                className='relative block w-full appearance-none rounded-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
                 placeholder='Email address'
                 value={formData.email}
                 onChange={handleChange}
               />
             </div>
             <div>
-              <label
-                htmlFor='password'
-                className='sr-only'
-              >
+              <label htmlFor='password' className='sr-only'>
                 Password
               </label>
               <input
@@ -69,7 +64,7 @@ const Login = () => {
                 name='password'
                 type='password'
                 required
-                className='appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm dark:border-gray-600 dark:placeholder-gray-400 dark:text-white'
+                className='relative block w-full appearance-none rounded-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:text-white dark:placeholder-gray-400'
                 placeholder='Password'
                 value={formData.password}
                 onChange={handleChange}
@@ -83,7 +78,7 @@ const Login = () => {
                 id='remember-me'
                 name='remember-me'
                 type='checkbox'
-                className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded'
+                className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
               />
               <label
                 htmlFor='remember-me'
@@ -96,7 +91,7 @@ const Login = () => {
             <div className='text-sm'>
               <a
                 href='#'
-                className='font-medium text-blue-600 hover:text-blue-500 '
+                className='font-medium text-blue-600 hover:text-blue-500'
               >
                 Forgot your password?
               </a>
@@ -106,13 +101,13 @@ const Login = () => {
           <div>
             <button
               type='submit'
-              className='group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
+              className='group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
             >
               Sign in
             </button>
           </div>
 
-          <div className='text-sm text-center dark:text-white'>
+          <div className='text-center text-sm dark:text-white'>
             Don't have an account?{' '}
             <Link
               to='/register'

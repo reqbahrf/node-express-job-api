@@ -8,6 +8,7 @@ import Header from '../components/Header';
 import Input from '../components/Input';
 import navigateToDashboard from '../utils/navigateToDashboard';
 import Modal from '@/components/Modal';
+import toast from 'react-hot-toast';
 
 const Register = () => {
   const dispatch = useAppDispatch();
@@ -48,6 +49,10 @@ const Register = () => {
     setShowConfirmModal(false);
     if (authAPI.register.fulfilled.match(resultAction)) {
       navigate(navigateToDashboard(role || ''));
+    } else if (authAPI.register.rejected.match(resultAction)) {
+      const error = (resultAction.payload as string) || 'Something went wrong';
+      console.log('Error:', error);
+      toast.error(error);
     }
   };
   return (
