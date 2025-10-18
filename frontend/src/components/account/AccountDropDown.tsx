@@ -25,9 +25,9 @@ const AccountDropDown = ({
   );
 
   const handleToggleAccount = () => {
-    if (activeView === 'account') return;
+    if (activeView === 'Account') return;
     navigate('/account');
-    dispatch(setActiveView('account'));
+    dispatch(setActiveView('Account'));
     setToggleDropdown(false);
   };
   return (
@@ -48,7 +48,7 @@ const AccountDropDown = ({
           className='block w-full px-4 py-2 text-black hover:bg-gray-200 dark:text-white dark:hover:bg-gray-600'
           onClick={handleToggleAccount}
         >
-          {activeView === 'account' ? (
+          {activeView === 'Account' ? (
             <span className='inline-block'>
               <RiCircleFill size={10} className='text-green-500' />
             </span>

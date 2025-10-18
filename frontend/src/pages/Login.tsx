@@ -27,7 +27,8 @@ const Login = () => {
     e.preventDefault();
     const resultAction = await dispatch(authAPI.login(formData));
     if (authAPI.login.fulfilled.match(resultAction)) {
-      navigate(navigateToDashboard(role || ''));
+      const role = resultAction.payload.role;
+      navigate(navigateToDashboard(role));
     } else if (authAPI.login.rejected.match(resultAction)) {
       const error = (resultAction.payload as string) || 'Something went wrong';
       toast.error('Login failed: ' + error);

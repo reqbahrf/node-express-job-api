@@ -1,12 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type viewType = 'dashboard' | 'account';
+type viewType = 'Dashboard' | 'Account';
 
 interface UIstate {
   activeView: viewType;
 }
 const initialState: UIstate = {
-  activeView: 'dashboard',
+  activeView: 'Dashboard',
 };
 
 const uiSlice = createSlice({

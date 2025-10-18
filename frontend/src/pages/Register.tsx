@@ -12,7 +12,6 @@ import toast from 'react-hot-toast';
 
 const Register = () => {
   const dispatch = useAppDispatch();
-  const role = useAppSelector((state) => state.auth.role);
   const navigate = useNavigate();
   const { registerError } = useAppSelector((state) => state.auth);
   const [formData, setformData] = useState({
@@ -48,7 +47,8 @@ const Register = () => {
     const resultAction = await dispatch(authAPI.register(formData));
     setShowConfirmModal(false);
     if (authAPI.register.fulfilled.match(resultAction)) {
-      navigate(navigateToDashboard(role || ''));
+      const role = resultAction.payload.role;
+      navigate(navigateToDashboard(role));
     } else if (authAPI.register.rejected.match(resultAction)) {
       const error = (resultAction.payload as string) || 'Something went wrong';
       console.log('Error:', error);

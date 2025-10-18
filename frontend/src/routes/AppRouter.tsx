@@ -27,7 +27,7 @@ const AppRouter = () => {
 
   const withLayout = (
     Layout: ComponentType<{ children: ReactNode }>,
-    page: ReactNode
+    page: ReactNode,
   ) => {
     if (!accessToken) return <Navigate to='/login' />;
     return <Layout>{page}</Layout>;
@@ -43,10 +43,7 @@ const AppRouter = () => {
   return (
     <>
       <Routes>
-        <Route
-          path='/'
-          element={<Home />}
-        />
+        <Route path='/' element={<Home />} />
         <Route
           path='/login'
           element={
@@ -54,10 +51,7 @@ const AppRouter = () => {
               {!accessToken ? (
                 <Login />
               ) : (
-                <Navigate
-                  to={navigateToDashboard(role || '')}
-                  replace
-                />
+                <Navigate to={navigateToDashboard(role || '')} replace />
               )}
             </Suspense>
           }
@@ -75,7 +69,7 @@ const AppRouter = () => {
           }
         />
         <Route
-          path='/user/dashboard'
+          path='/applicant/dashboard'
           element={
             <ProtectedRoute allowedRoles={[ROLES.APPLICANT]}>
               {withLayout(AppLayout, <JobsView />)}
