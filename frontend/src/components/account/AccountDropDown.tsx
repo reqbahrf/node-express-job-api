@@ -33,12 +33,14 @@ const AccountDropDown = ({
   return (
     <>
       <div className='absolute top-[110%] right-[-15px] mt-4 w-60 rounded-md bg-white py-2 shadow-lg dark:bg-gray-800'>
-        <div className='mb-4 flex-col justify-center'>
-          <div className='text-dark ps-2 text-center dark:text-white'>
-            {formattedRole}
-          </div>
+        <div className='mb-2 flex-col justify-center'>
           <div className='text-dark ps-2 text-center text-2xl font-bold dark:text-white'>
             {user}
+          </div>
+          <div className='px-2 py-1 text-center text-sm font-semibold text-white'>
+            <span className='rounded-3xl bg-gray-200 px-2 py-1 text-black dark:bg-gray-600 dark:text-white'>
+              {formattedRole}
+            </span>
           </div>
         </div>
         <hr className='border-gray-200 dark:border-gray-600' />
