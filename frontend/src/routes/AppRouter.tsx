@@ -16,9 +16,9 @@ const AdminView = lazy(() => import('../pages/admin/AdminView'));
 const Account = lazy(() => import('../pages/Account'));
 import Loading from '../components/Loading';
 import AppLayout from '../layout/AppLayout';
-import navigateToDashboard from '../utils/navigateToDashboard';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { ROLES } from '@/constant/roles';
+import navigateToDashboard from '@/utils/navigateToDashboard';
 
 const AppRouter = () => {
   const { accessToken, role } = useAppSelector((state) => state.auth);
@@ -29,6 +29,7 @@ const AppRouter = () => {
     Layout: ComponentType<{ children: ReactNode }>,
     page: ReactNode,
   ) => {
+    if (globalLoading) return <Loading />;
     if (!accessToken) return <Navigate to='/login' />;
     return <Layout>{page}</Layout>;
   };

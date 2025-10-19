@@ -20,6 +20,7 @@ export default defineConfig({
       },
     },
   },
+  port: 5173,
   build: {
     outDir: '../frontend/dist',
     emptyOutDir: true,

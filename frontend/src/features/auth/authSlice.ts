@@ -7,7 +7,6 @@ interface AuthState {
   user: string | null;
   role: string | null;
   accessToken: string;
-  isLoading: boolean;
   error: string | null;
   registerError: string | null;
 }
@@ -18,7 +17,6 @@ const initialState: AuthState = {
   user: null,
   role: null,
   accessToken: '',
-  isLoading: false,
   registerError: null,
   error: null,
 };
@@ -30,11 +28,9 @@ const authSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(authAPI.login.pending, (state) => {
-        state.isLoading = true;
         state.error = null;
       })
       .addCase(authAPI.login.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.userid = action.payload.userid;
         state.email = action.payload.email;
         state.user = action.payload.username;
@@ -42,7 +38,6 @@ const authSlice = createSlice({
         state.accessToken = action.payload.accessToken;
       })
       .addCase(authAPI.login.rejected, (state, action) => {
-        state.isLoading = false;
         state.error = action.payload as string;
       })
 
@@ -54,11 +49,9 @@ const authSlice = createSlice({
 
       // Register
       .addCase(authAPI.register.pending, (state) => {
-        state.isLoading = true;
         state.registerError = null;
       })
       .addCase(authAPI.register.fulfilled, (state, action) => {
-        state.isLoading = false;
         state.userid = action.payload.userid;
         state.email = action.payload.email;
         state.user = action.payload.username;
@@ -66,7 +59,6 @@ const authSlice = createSlice({
         state.accessToken = action.payload.accessToken;
       })
       .addCase(authAPI.register.rejected, (state, action) => {
-        state.isLoading = false;
         state.registerError = action.payload as string;
       })
 

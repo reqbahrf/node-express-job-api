@@ -50,15 +50,17 @@ const register = async (req: Request, res: Response) => {
 };
 
 const refreshToken = async (req: Request, res: Response) => {
-  const { resToken } = req.cookies;
-  console.log(resToken);
-  if (!resToken) throw new UnauthenticatedError('Authentication invalid');
   try {
+    const { resToken } = req.cookies;
+    console.log(resToken);
+    if (!resToken) throw new UnauthenticatedError('Token not found or expired');
     const secret = process.env.JWT_REFRESH_SECRET;
     if (!secret) throw new UnauthenticatedError('Authentication invalid');
     const decode = jwt.verify(resToken, secret) as UserJwtPayload;
     const user = await User.findOne({ _id: decode.userId });
-    if (!user) return;
+    if (!user) {
+      throw new UnauthenticatedError('User not found');
+    }
     const accessToken = user.generateAccessToken();
     res.status(StatusCodes.OK).json({
       userid: user._id,

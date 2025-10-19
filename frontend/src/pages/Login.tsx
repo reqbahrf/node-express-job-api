@@ -1,16 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AuthFormContainer from '../layout/AuthFormLayout';
 import { Link, useNavigate } from 'react-router-dom';
 import authAPI from '../features/auth/authAPI';
-import { useAppDispatch, useAppSelector } from '../app/store';
+import { useAppDispatch } from '../app/store';
 import Header from '../components/Header';
 import navigateToDashboard from '../utils/navigateToDashboard';
 import toast from 'react-hot-toast';
+import { setActiveView } from '@/features/ui/uiSlice';
 
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const role = useAppSelector((state) => state.auth.role);
+  useEffect(() => {
+    dispatch(setActiveView('Login'));
+  }, []);
   const [formData, setformData] = useState({
     email: '',
     password: '',
