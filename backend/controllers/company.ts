@@ -34,9 +34,16 @@ const registerCompany = async (req: Request, res: Response) => {
 const getCompany = async (req: Request, res: Response) => {
   const company = await CompanyInfo.findById(req.params.id);
   if (!company) {
-    throw new NotFoundError('Company not found');
+    return res
+      .status(StatusCodes.NOT_FOUND)
+      .json({
+        msg: 'Company not found or not registered, please register first',
+        isRegistered: false,
+      });
   }
-  res.status(StatusCodes.OK).json({ company });
+
+  const isRegistered = company.status === 'approved';
+  res.status(StatusCodes.OK).json({ company, isRegistered });
 };
 
 const updateCompanyStatus = async (req: Request, res: Response) => {

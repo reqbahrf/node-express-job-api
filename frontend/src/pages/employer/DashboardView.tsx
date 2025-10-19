@@ -1,13 +1,24 @@
 import { useAppDispatch, useAppSelector } from '@/app/store';
 import { setActiveView } from '@/features/ui/uiSlice';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { getCompanyInfo } from '@/features/employer/companySlice';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardView = () => {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { user, userid, accessToken } = useAppSelector((state) => state.auth);
+  const hasFetched = useRef(false);
   useEffect(() => {
-    dispatch(setActiveView('Dashboard'));
+    if (!hasFetched.current) {
+      dispatch(setActiveView('Dashboard'));
+      if (userid && accessToken) {
+        dispatch(getCompanyInfo({ companyId: userid!, accessToken, navigate }));
+      }
+      hasFetched.current = true;
+    }
   }, []);
+  console.log('Dashboard rendered');
   return (
     <>
       <h1 className='text-4xl font-bold'>Welcome back, {user}</h1>

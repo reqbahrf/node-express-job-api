@@ -18,6 +18,9 @@ const AdminDashboardView = lazy(() => import('../pages/admin/DashboardView'));
 const EmployerDashboardView = lazy(
   () => import('../pages/employer/DashboardView'),
 );
+const EmployerCompanyForm = lazy(
+  () => import('../features/employer/components/CompanyInfoForm'),
+);
 const Account = lazy(() => import('../pages/Account'));
 import Loading from '../components/Loading';
 import AppLayout from '../layout/AppLayout';
@@ -79,6 +82,14 @@ const AppRouter = () => {
           element={
             <ProtectedRoute allowedRoles={[ROLES.APPLICANT]}>
               {withLayout(AppLayout, <ApplicantDashboardView />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/employer/company-form'
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.EMPLOYER]}>
+              {withLayout(AppLayout, <EmployerCompanyForm />)}
             </ProtectedRoute>
           }
         />
