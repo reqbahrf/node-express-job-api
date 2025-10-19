@@ -4,6 +4,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import loadingReducer from '../features/loading/loadingSlice';
 import jobReducer from '../features/job/jobSlice';
 import uiReducer from '../features/ui/uiSlice';
+import companyReducer from '../features/employer/companySlice';
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     loading: loadingReducer,
     job: jobReducer,
     ui: uiReducer,
+    company: companyReducer,
   },
 });
 

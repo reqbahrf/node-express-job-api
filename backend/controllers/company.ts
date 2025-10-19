@@ -31,6 +31,14 @@ const registerCompany = async (req: Request, res: Response) => {
     .json({ message: 'Company registration submitted for approval' });
 };
 
+const getCompany = async (req: Request, res: Response) => {
+  const company = await CompanyInfo.findById(req.params.id);
+  if (!company) {
+    throw new NotFoundError('Company not found');
+  }
+  res.status(StatusCodes.OK).json({ company });
+};
+
 const updateCompanyStatus = async (req: Request, res: Response) => {
   const {
     params: id,
@@ -59,9 +67,9 @@ const getCompanies = async (req: Request, res: Response) => {
   } = req;
   const companies = await CompanyInfo.find({ status }).populate(
     'employer',
-    'username email',
+    'username email'
   );
   res.status(StatusCodes.OK).json({ companies });
 };
 
-export { registerCompany, updateCompanyStatus, getCompanies };
+export { registerCompany, updateCompanyStatus, getCompanies, getCompany };

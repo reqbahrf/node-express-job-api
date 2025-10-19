@@ -14,6 +14,7 @@ import { useAppDispatch, useAppSelector } from '../../app/store';
 import jobAPI from '../../features/job/jobAPI';
 import useSocket from '../../hooks/useSocket';
 import { RiAddLine } from '@remixicon/react';
+import { setActiveView } from '../../features/ui/uiSlice';
 type ModalState =
   | {
       type: 'add' | 'update' | 'delete' | null;
@@ -21,7 +22,7 @@ type ModalState =
     }
   | { type: null; Job: null };
 
-const JobsView = () => {
+const DashboardView = () => {
   const dispatch = useAppDispatch();
   const jobs = useAppSelector((state) => state.job.jobs);
   const { userid, role } = useAppSelector((state) => state.auth);
@@ -40,6 +41,7 @@ const JobsView = () => {
   }, []);
 
   useEffect(() => {
+    dispatch(setActiveView('Dashboard'));
     dispatch(jobAPI.fetchJob());
   }, [dispatch]);
   return (
@@ -114,4 +116,4 @@ const JobsView = () => {
   );
 };
 
-export default JobsView;
+export default DashboardView;

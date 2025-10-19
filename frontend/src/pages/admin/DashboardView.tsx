@@ -7,7 +7,7 @@ import { adminAPI } from '@/features/admin/adminAPI';
 type statResponse = {
   applicantUserCount: number;
 };
-const AdminView = () => {
+const DashboardView = () => {
   const dispatch = useAppDispatch();
   const { accessToken } = useAppSelector((state) => state.auth);
   const { userid, user, role } = useAppSelector((state) => state.auth);
@@ -50,4 +50,4 @@ const AdminView = () => {
   );
 };
 
-export default AdminView;
+export default DashboardView;

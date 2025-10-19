@@ -11,8 +11,13 @@ import authAPI from '../features/auth/authAPI';
 const Home = lazy(() => import('../pages/Home'));
 const Login = lazy(() => import('../pages/Login'));
 const Register = lazy(() => import('../pages/Register'));
-const JobsView = lazy(() => import('../pages/applicant/JobsView'));
-const AdminView = lazy(() => import('../pages/admin/AdminView'));
+const ApplicantDashboardView = lazy(
+  () => import('../pages/applicant/DashboardView'),
+);
+const AdminDashboardView = lazy(() => import('../pages/admin/DashboardView'));
+const EmployerDashboardView = lazy(
+  () => import('../pages/employer/DashboardView'),
+);
 const Account = lazy(() => import('../pages/Account'));
 import Loading from '../components/Loading';
 import AppLayout from '../layout/AppLayout';
@@ -73,7 +78,15 @@ const AppRouter = () => {
           path='/applicant/dashboard'
           element={
             <ProtectedRoute allowedRoles={[ROLES.APPLICANT]}>
-              {withLayout(AppLayout, <JobsView />)}
+              {withLayout(AppLayout, <ApplicantDashboardView />)}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/employer/dashboard'
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.EMPLOYER]}>
+              {withLayout(AppLayout, <EmployerDashboardView />)}
             </ProtectedRoute>
           }
         />
@@ -81,7 +94,7 @@ const AppRouter = () => {
           path='/admin/dashboard'
           element={
             <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
-              {withLayout(AppLayout, <AdminView />)}
+              {withLayout(AppLayout, <AdminDashboardView />)}
             </ProtectedRoute>
           }
         />
