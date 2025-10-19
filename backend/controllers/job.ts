@@ -6,7 +6,6 @@ import {
   UnauthenticatedError,
 } from '../errors/index.js';
 import { Request, Response } from 'express';
-import { UserPayload } from '../types/express.js';
 
 const getAllJobs = async (req: Request, res: Response) => {
   const jobs = await Job.find({ createdBy: req?.user?.userId }).sort(

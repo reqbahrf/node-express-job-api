@@ -1,4 +1,5 @@
-const setTokenCookie = (res: any, refreshToken: string) => {
+import type { Response } from 'express';
+const setTokenCookie = (res: Response, refreshToken: string) => {
   res.cookie('resToken', refreshToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',

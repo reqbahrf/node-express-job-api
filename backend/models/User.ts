@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
@@ -7,11 +7,13 @@ interface IUser extends Document {
   email: string;
   password: string;
   role: string;
+  /* eslint-disable  no-unused-vars */
   _generateJWT(secret: string, lifetime: string): string;
   generateAccessToken(): string;
   generateRefreshToken(): string;
   createJWT(): { accessToken: string; refreshToken: string };
   comparePassword(userProvidedPassword: string): Promise<boolean>;
+  /* eslint-enable  no-unused-vars */
 }
 const UserSchema = new mongoose.Schema<IUser>({
   name: {
@@ -49,7 +51,7 @@ UserSchema.pre('save', async function (): Promise<void> {
 
 UserSchema.methods._generateJWT = function (
   secret: jwt.Secret,
-  lifetime: jwt.SignOptions['expiresIn'],
+  lifetime: jwt.SignOptions['expiresIn']
 ): string {
   return jwt.sign(
     {
@@ -61,21 +63,21 @@ UserSchema.methods._generateJWT = function (
     secret,
     {
       expiresIn: lifetime,
-    },
+    }
   );
 };
 
 UserSchema.methods.generateAccessToken = function (): string {
   return this._generateJWT(
     process.env.JWT_ACCESS_SECRET,
-    process.env.JWT_ACCESS_LIFETIME,
+    process.env.JWT_ACCESS_LIFETIME
   );
 };
 
 UserSchema.methods.generateRefreshToken = function (): string {
   return this._generateJWT(
     process.env.JWT_REFRESH_SECRET,
-    process.env.JWT_REFRESH_LIFETIME,
+    process.env.JWT_REFRESH_LIFETIME
   );
 };
 
@@ -90,7 +92,7 @@ UserSchema.methods.createJWT = function (): {
 };
 
 UserSchema.methods.comparePassword = async function (
-  userProvidedPassword: string,
+  userProvidedPassword: string
 ): Promise<boolean> {
   const isMatch = await bcrypt.compare(userProvidedPassword, this.password);
   return isMatch;

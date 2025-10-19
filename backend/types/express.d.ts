@@ -1,6 +1,4 @@
-import { Request } from 'express';
-
-interface UserPayload {
+export interface UserPayload {
   userId: string;
   username: string;
   role: string;

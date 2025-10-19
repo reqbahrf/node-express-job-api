@@ -19,7 +19,9 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
     };
     next();
   } catch (error) {
-    throw new UnauthenticatedError('Authentication invalid token expired');
+    throw new UnauthenticatedError(
+      'Authentication invalid token expired:' + error
+    );
   }
 };
 

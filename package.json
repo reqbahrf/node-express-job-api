@@ -11,7 +11,10 @@
     "client": "cd frontend && npm run dev",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm run build:backend && cd frontend && npm run build",
-    "preview": "cd frontend && npm run preview"
+    "preview": "cd frontend && npm run preview",
+    "lint": "eslint .",
+    "lint:frontend": "cd frontend && npm run lint",
+    "lint:backend": "eslint backend --ext .ts"
   },
   "author": "Reanz Arthur",
   "license": "ISC",
@@ -36,11 +39,14 @@
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
+    "@eslint/js": "^9.38.0",
     "concurrently": "^9.2.1",
+    "eslint": "^9.38.0",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.0",
-    "typescript": "^5.x.x"
+    "typescript": "^5.x.x",
+    "typescript-eslint": "^8.46.1"
   },
   "engines": {
     "node": "22.x"

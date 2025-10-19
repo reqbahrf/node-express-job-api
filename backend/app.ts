@@ -12,9 +12,6 @@ const __dirname = path.dirname(__filename);
 //security packages
 import helmet from 'helmet';
 import cors from 'cors';
-import rateLimiter from 'express-rate-limit';
-// connectDB
-import connectDB from './db/connect.js';
 
 import adminUser from './middleware/adminUser.js';
 import authMiddleware from './middleware/authenticated.js';
@@ -63,9 +60,9 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use('/api/v1/admin', authMiddleware, adminUser, adminRouter);
 // API routes
-app.use('/api/v1/auth', expressSanitizer(), authRouter);
-app.use('/api/v1/password', authMiddleware, expressSanitizer(), passwordRouter);
-app.use('/api/v1/jobs', authMiddleware, expressSanitizer(), jobRouter);
+app.use('/api/v1/auth', expressSanitizer, authRouter);
+app.use('/api/v1/password', authMiddleware, expressSanitizer, passwordRouter);
+app.use('/api/v1/jobs', authMiddleware, expressSanitizer, jobRouter);
 app.use(/^(?!\/api\/).*/, notFoundMiddleware);
 
 // Error handling

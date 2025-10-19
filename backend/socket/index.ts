@@ -18,7 +18,7 @@ const initSocket = (server: NodeServer) => {
       io.emit('rt-user-count', onlineUsers.size);
     });
     socket.on('disconnect', () => {
-      for (let [userId, socketId] of onlineUsers.entries()) {
+      for (const [userId, socketId] of onlineUsers.entries()) {
         if (socketId === socket.id) {
           onlineUsers.delete(userId);
           break;

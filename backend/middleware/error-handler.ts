@@ -1,13 +1,12 @@
 import { StatusCodes } from 'http-status-codes';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { CustomError } from '../errors/index.js';
 const errorHandlerMiddleware = (
   err: CustomError,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
-  let customError = {
+  const customError = {
     errCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
     errMsg: err.message || 'Something went wrong, please try again later',
   };

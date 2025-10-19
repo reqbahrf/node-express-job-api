@@ -1,7 +1,7 @@
 import sanitizeHtml from 'sanitize-html';
 import { Request, Response, NextFunction } from 'express';
 
-type value = string | object | Array<any> | null;
+type Value = string | object | Array<string | object | Value[]> | null;
 
 const expressSanitizer = (options = {}) => {
   const defaultOptions = {
@@ -10,7 +10,7 @@ const expressSanitizer = (options = {}) => {
   };
   const finalOptions = { ...defaultOptions, ...options };
 
-  function deepSanitize(value: value): value {
+  function deepSanitize(value: Value): Value {
     if (typeof value !== 'object' || value === null) {
       return typeof value === 'string'
         ? sanitizeHtml(value, finalOptions)
@@ -21,12 +21,10 @@ const expressSanitizer = (options = {}) => {
       return value.length > 0 ? value.map(deepSanitize) : value;
     }
 
-    const sanitizedObj: { [key: string]: value } = {};
-    const objectValue = value as Record<string, any>;
-    for (const key in objectValue) {
-      if (objectValue.hasOwnProperty(key)) {
-        sanitizedObj[key] = deepSanitize(objectValue[key]);
-      }
+    const sanitizedObj: { [key: string]: Value } = {};
+    const objectValue = value as Record<string, Value>;
+    for (const [key, val] of Object.entries(objectValue)) {
+      sanitizedObj[key] = deepSanitize(val);
     }
     return sanitizedObj;
   }

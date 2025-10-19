@@ -15,4 +15,4 @@ export interface JobQueryObject extends JobQueryRequest {
   'salaryRange.max'?: { $lte: number };
 }
 
-export interface JobPostRequest extends Request<{}, any, any, JobQueryObject> {}
+export type JobPostRequest = Request<never, never, never, JobQueryObject>;
