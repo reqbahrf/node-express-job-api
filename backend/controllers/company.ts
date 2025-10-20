@@ -21,8 +21,13 @@ const registerCompany = async (req: Request, res: Response) => {
     throw new BadRequestError('Company already exists');
   }
 
+  const registrationDocs = (req.files as Express.Multer.File[])?.map(
+    (f) => f.path
+  );
+
   await CompanyInfo.create({
     ...req.body,
+    registrationDocs,
     employer: req.user.userId,
   });
 
@@ -32,14 +37,15 @@ const registerCompany = async (req: Request, res: Response) => {
 };
 
 const getCompany = async (req: Request, res: Response) => {
-  const company = await CompanyInfo.findById(req.params.id);
+  const { id } = req.params;
+  const company = await CompanyInfo.findOne({
+    employer: id,
+  });
   if (!company) {
-    return res
-      .status(StatusCodes.NOT_FOUND)
-      .json({
-        msg: 'Company not found or not registered, please register first',
-        isRegistered: false,
-      });
+    return res.status(StatusCodes.NOT_FOUND).json({
+      msg: 'Company not found or not registered, please register first',
+      isRegistered: false,
+    });
   }
 
   const isRegistered = company.status === 'approved';

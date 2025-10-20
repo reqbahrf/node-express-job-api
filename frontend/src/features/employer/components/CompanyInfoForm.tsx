@@ -11,6 +11,7 @@ import {
   RiPhoneLine,
   RiImageLine,
   RiFileTextLine,
+  RiCloseLine,
 } from '@remixicon/react';
 import Input from '@/components/Input';
 import { setLoading } from '../../loading/loadingSlice';
@@ -26,7 +27,7 @@ interface CompanyInfoFormState {
   contactEmail: string;
   contactPhone: string;
   logoUrl: string;
-  registrationDocs: FileList | null;
+  registrationDocs: File[];
 }
 
 const CompanyInfoForm = () => {
@@ -41,7 +42,7 @@ const CompanyInfoForm = () => {
     contactEmail: '',
     contactPhone: '',
     logoUrl: '',
-    registrationDocs: null,
+    registrationDocs: [],
   });
 
   const handleChange = (
@@ -52,7 +53,20 @@ const CompanyInfoForm = () => {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, registrationDocs: e.target.files }));
+    setFormData((prev) => ({
+      ...prev,
+      registrationDocs: [
+        ...prev.registrationDocs,
+        ...Array.from(e.target.files as FileList),
+      ],
+    }));
+  };
+
+  const handleRemoveFile = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      registrationDocs: prev.registrationDocs.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -250,7 +264,7 @@ const CompanyInfoForm = () => {
                       name='registrationDocs'
                       type='file'
                       multiple
-                      accept='.pdf,.jpg,.png,.jpeg'
+                      accept='.pdf,.jpg,.png,.jpeg,.doc,.docx'
                       onChange={handleFileChange}
                       className='sr-only'
                     />
@@ -263,6 +277,28 @@ const CompanyInfoForm = () => {
               </div>
             </div>
           </div>
+          {formData.registrationDocs &&
+            formData.registrationDocs.length > 0 && (
+              <ul className='mt-3 text-sm text-gray-700 dark:text-gray-300'>
+                {Array.from(formData.registrationDocs).map((file, index) => (
+                  <li key={index} className='flex items-center justify-between'>
+                    <span>{file.name}</span>
+                    <div className='flex items-center'>
+                      <span className='text-xs text-gray-400'>
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                      <button
+                        type='button'
+                        onClick={() => handleRemoveFile(index)}
+                        className='ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                      >
+                        <RiCloseLine />
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           <div className='pt-4'>
             <button
               type='submit'
