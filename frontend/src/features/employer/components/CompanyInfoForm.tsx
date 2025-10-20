@@ -1,8 +1,5 @@
 import { useEffect, useState } from 'react';
-import { toast } from 'react-hot-toast';
-import axios from 'axios';
 import {
-  RiUploadLine,
   RiBriefcaseLine,
   RiUserLine,
   RiMapPinLine,
@@ -17,8 +14,10 @@ import Input from '@/components/Input';
 import { setLoading } from '../../loading/loadingSlice';
 import { useAppDispatch, useAppSelector } from '@/app/store';
 import { setActiveView } from '@/features/ui/uiSlice';
+import { companyAPI } from '../companyAPI';
+import { Link } from 'react-router-dom';
 
-interface CompanyInfoFormState {
+export interface CompanyInfoFormState {
   companyName: string;
   ceoName: string;
   industry: string;
@@ -32,8 +31,9 @@ interface CompanyInfoFormState {
 
 const CompanyInfoForm = () => {
   const accessToken = useAppSelector((state) => state.auth.accessToken);
+  const isRegistered = useAppSelector((state) => state.company.isRegistered);
   const dispatch = useAppDispatch();
-  const [formData, setFormData] = useState<CompanyInfoFormState>({
+  const [companyFormData, setCompanyFormData] = useState<CompanyInfoFormState>({
     companyName: '',
     ceoName: '',
     industry: '',
@@ -49,11 +49,11 @@ const CompanyInfoForm = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setCompanyFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
+    setCompanyFormData((prev) => ({
       ...prev,
       registrationDocs: [
         ...prev.registrationDocs,
@@ -63,7 +63,7 @@ const CompanyInfoForm = () => {
   };
 
   const handleRemoveFile = (index: number) => {
-    setFormData((prev) => ({
+    setCompanyFormData((prev) => ({
       ...prev,
       registrationDocs: prev.registrationDocs.filter((_, i) => i !== index),
     }));
@@ -75,36 +75,21 @@ const CompanyInfoForm = () => {
     dispatch(setLoading(dispatchPayload));
 
     try {
-      const data = new FormData();
-      (Object.keys(formData) as (keyof CompanyInfoFormState)[]).forEach(
+      const formData = new FormData();
+      (Object.keys(companyFormData) as (keyof CompanyInfoFormState)[]).forEach(
         (key) => {
           if (key !== 'registrationDocs') {
-            data.append(key, formData[key] as string);
+            formData.append(key, companyFormData[key] as string);
           }
         },
       );
 
-      // Handle file uploads
-      if (formData.registrationDocs) {
-        Array.from(formData.registrationDocs).forEach((file) => {
-          data.append('registrationDocs', file);
+      if (companyFormData.registrationDocs) {
+        Array.from(companyFormData.registrationDocs).forEach((file) => {
+          formData.append('registrationDocs', file);
         });
       }
-
-      await toast.promise(
-        axios.post('/api/v1/company/register-company', data, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'multipart/form-data',
-          },
-        }),
-        {
-          loading: 'Submitting company info...',
-          success: 'Company registered successfully!',
-          error: (err) =>
-            err.response?.data?.message || 'Failed to submit company info',
-        },
-      );
+      await dispatch(companyAPI.registerCompany({ formData, accessToken }));
     } catch (error) {
       console.error(error);
     } finally {
@@ -136,7 +121,7 @@ const CompanyInfoForm = () => {
               <Input
                 type='text'
                 name='companyName'
-                value={formData.companyName}
+                value={companyFormData.companyName}
                 onChange={handleChange}
                 placeholder='Company Name'
                 className='w-full pl-10'
@@ -150,7 +135,7 @@ const CompanyInfoForm = () => {
               <Input
                 type='text'
                 name='ceoName'
-                value={formData.ceoName}
+                value={companyFormData.ceoName}
                 onChange={handleChange}
                 placeholder='CEO Name'
                 className='w-full pl-10'
@@ -166,7 +151,7 @@ const CompanyInfoForm = () => {
               <Input
                 type='text'
                 name='industry'
-                value={formData.industry}
+                value={companyFormData.industry}
                 onChange={handleChange}
                 placeholder='Industry Type'
                 className='w-full pl-10'
@@ -179,7 +164,7 @@ const CompanyInfoForm = () => {
               </div>
               <textarea
                 name='address'
-                value={formData.address}
+                value={companyFormData.address}
                 onChange={handleChange}
                 placeholder='Company Address'
                 rows={3}
@@ -196,7 +181,7 @@ const CompanyInfoForm = () => {
               <Input
                 type='url'
                 name='website'
-                value={formData.website}
+                value={companyFormData.website}
                 onChange={handleChange}
                 placeholder='Website (optional)'
                 className='w-full pl-10'
@@ -209,7 +194,7 @@ const CompanyInfoForm = () => {
               <Input
                 type='email'
                 name='contactEmail'
-                value={formData.contactEmail}
+                value={companyFormData.contactEmail}
                 onChange={handleChange}
                 placeholder='Contact Email'
                 className='w-full pl-10'
@@ -225,7 +210,7 @@ const CompanyInfoForm = () => {
               <Input
                 type='tel'
                 name='contactPhone'
-                value={formData.contactPhone}
+                value={companyFormData.contactPhone}
                 onChange={handleChange}
                 placeholder='Contact Number'
                 className='w-full pl-10'
@@ -239,7 +224,7 @@ const CompanyInfoForm = () => {
               <Input
                 type='url'
                 name='logoUrl'
-                value={formData.logoUrl}
+                value={companyFormData.logoUrl}
                 onChange={handleChange}
                 placeholder='Logo URL (optional)'
                 className='w-full pl-10'
@@ -277,26 +262,31 @@ const CompanyInfoForm = () => {
               </div>
             </div>
           </div>
-          {formData.registrationDocs &&
-            formData.registrationDocs.length > 0 && (
+          {companyFormData.registrationDocs &&
+            companyFormData.registrationDocs.length > 0 && (
               <ul className='mt-3 text-sm text-gray-700 dark:text-gray-300'>
-                {Array.from(formData.registrationDocs).map((file, index) => (
-                  <li key={index} className='flex items-center justify-between'>
-                    <span>{file.name}</span>
-                    <div className='flex items-center'>
-                      <span className='text-xs text-gray-400'>
-                        {(file.size / 1024 / 1024).toFixed(2)} MB
-                      </span>
-                      <button
-                        type='button'
-                        onClick={() => handleRemoveFile(index)}
-                        className='ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
-                      >
-                        <RiCloseLine />
-                      </button>
-                    </div>
-                  </li>
-                ))}
+                {Array.from(companyFormData.registrationDocs).map(
+                  (file, index) => (
+                    <li
+                      key={index}
+                      className='flex items-center justify-between'
+                    >
+                      <span>{file.name}</span>
+                      <div className='flex items-center'>
+                        <span className='text-xs text-gray-400'>
+                          {(file.size / 1024 / 1024).toFixed(2)} MB
+                        </span>
+                        <button
+                          type='button'
+                          onClick={() => handleRemoveFile(index)}
+                          className='ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                        >
+                          <RiCloseLine />
+                        </button>
+                      </div>
+                    </li>
+                  ),
+                )}
               </ul>
             )}
           <div className='pt-4'>
@@ -306,6 +296,14 @@ const CompanyInfoForm = () => {
             >
               Submit Company Information
             </button>
+            {isRegistered && (
+              <Link
+                to='/employer/dashboard'
+                className='mt-4 block text-center text-sm font-medium text-blue-600 hover:text-blue-500 dark:text-blue-500 dark:hover:text-blue-400'
+              >
+                Go back to dashboard
+              </Link>
+            )}
           </div>
         </form>
       </div>

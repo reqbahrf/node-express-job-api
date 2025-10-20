@@ -6,34 +6,38 @@ import {
   NotFoundError,
   UnauthenticatedError,
 } from '../errors/index.js';
+import { cleanupOnError } from '../utils/cleanupOnError.js';
 
 //Employer
 const registerCompany = async (req: Request, res: Response) => {
-  if (!req.user || req.user.role !== 'employer') {
-    throw new UnauthenticatedError('Unauthorized');
+  const files = req.files as Express.Multer.File[] | undefined;
+  let registrationDocs: string[] = [];
+  try {
+    if (!req.user || req.user.role !== 'employer') {
+      throw new UnauthenticatedError('Unauthorized');
+    }
+
+    const existingCompany = await CompanyInfo.findOne({
+      employer: req.user.userId,
+    });
+
+    if (existingCompany) {
+      throw new BadRequestError('Company already exists');
+    }
+
+    registrationDocs = files?.map((f) => f.path) || [];
+
+    const data = await CompanyInfo.create({
+      ...req.body,
+      registrationDocs,
+      employer: req.user.userId,
+    });
+
+    res.status(StatusCodes.CREATED).json({ isRegistered: true, data });
+  } catch (error) {
+    await cleanupOnError(registrationDocs, error as Error);
+    throw error;
   }
-
-  const existingCompany = await CompanyInfo.findOne({
-    employer: req.user.userId,
-  });
-
-  if (existingCompany) {
-    throw new BadRequestError('Company already exists');
-  }
-
-  const registrationDocs = (req.files as Express.Multer.File[])?.map(
-    (f) => f.path
-  );
-
-  await CompanyInfo.create({
-    ...req.body,
-    registrationDocs,
-    employer: req.user.userId,
-  });
-
-  res
-    .status(StatusCodes.CREATED)
-    .json({ message: 'Company registration submitted for approval' });
 };
 
 const getCompany = async (req: Request, res: Response) => {
