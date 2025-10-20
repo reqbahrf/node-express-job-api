@@ -40,7 +40,7 @@ const createUpload = (
       ? 'storage/app/public'
       : baseDestination === 'private'
         ? 'storage/app/private'
-        : 'storage/app/temp';
+        : 'storage/app/temps';
 
   return multer({
     storage: _createStorage(`${basedDes}/${destination}`),

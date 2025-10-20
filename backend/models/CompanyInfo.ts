@@ -46,17 +46,20 @@ const CompanyInfoSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
-    registrationDocs: {
-      type: [String],
-      default: [],
-    },
+    registrationDocs: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'File',
+        default: [],
+      },
+    ],
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
       default: 'pending',
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export default mongoose.model('CompanyInfo', CompanyInfoSchema);

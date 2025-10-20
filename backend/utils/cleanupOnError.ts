@@ -1,37 +1,42 @@
 import fs from 'fs/promises';
 import path from 'path';
-
-export const deleteFiles = async (filePaths: string[]): Promise<void> => {
-  if (filePaths.length === 0) return;
-
-  await Promise.all(
-    filePaths.map(async (filePath) => {
-      try {
-        const fullPath = path.isAbsolute(filePath)
-          ? filePath
-          : path.join(process.cwd(), filePath);
-
-        try {
-          await fs.access(fullPath, fs.constants.F_OK);
-          await fs.unlink(fullPath);
-          console.log(`Successfully deleted file: ${fullPath}`);
-        } catch (error) {
-          console.error(`Failed to delete file ${fullPath}:`, error);
-        }
-      } catch (error) {
-        console.error(`Error processing file path ${filePath}:`, error);
-      }
-    })
-  );
-};
+import File from '../models/File.js';
 
 export const cleanupOnError = async (
-  filePaths: string[],
+  filePaths: string[] = [],
+  fileIds: string[] = [],
   error: Error
 ): Promise<never> => {
-  if (filePaths.length > 0) {
-    console.log('Cleaning up uploaded files due to error:', error.message);
-    await deleteFiles(filePaths);
+  try {
+    if (filePaths.length > 0) {
+      await Promise.all(
+        filePaths.map(async (filePath) => {
+          try {
+            const fullPath = path.isAbsolute(filePath)
+              ? filePath
+              : path.join(process.cwd(), filePath);
+
+            await fs.access(fullPath, fs.constants.F_OK);
+            await fs.unlink(fullPath);
+          } catch (err) {
+            console.error(`Failed to delete file ${filePath}:`, err);
+          }
+        })
+      );
+    }
+
+    if (fileIds.length > 0) {
+      try {
+        const result = await File.deleteMany({ _id: { $in: fileIds } });
+        console.log(`Cleaned up ${result.deletedCount} file documents`);
+      } catch (err) {
+        console.error('Failed to clean up file documents:', err);
+      }
+    }
+  } catch (err) {
+    console.error('Error during cleanup:', err);
   }
+
+  // Always re-throw the original error
   throw error;
 };
