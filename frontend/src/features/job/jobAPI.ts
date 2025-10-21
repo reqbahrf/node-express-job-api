@@ -1,18 +1,17 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { JobRes } from './jobSlice';
 import { JobInfo } from '../../components/JobCard';
-import { RootState } from '../../app/store';
+import getAccessToken from '../../utils/getAccessToken';
 interface FromData {
   company: string;
   position: string;
   status?: string;
 }
 
-const getAccessToken = (thunkAPI: any) => {
-  const state = thunkAPI.getState() as RootState;
-  return state.auth.accessToken;
-};
+interface JobError {
+  msg: string;
+}
 
 const jobAPI = {
   fetchJob: createAsyncThunk('get/jobs', async (_, thunkAPI) => {
@@ -25,7 +24,8 @@ const jobAPI = {
       return data;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || 'Fetch jobs failed'
+        (error as AxiosError<JobError>).response?.data?.msg ||
+          'Fetch jobs failed',
       );
     }
   }),
@@ -40,21 +40,22 @@ const jobAPI = {
             headers: {
               Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
             },
-          }
+          },
         );
         return data.job;
       } catch (error) {
         return thunkAPI.rejectWithValue(
-          error.response?.data?.message || 'Create job failed'
+          (error as AxiosError<JobError>).response?.data?.msg ||
+            'Create job failed',
         );
       }
-    }
+    },
   ),
   updateJob: createAsyncThunk(
     'update/job',
     async (
       { formData, jobID }: { formData: FromData; jobID: string },
-      thunkAPI
+      thunkAPI,
     ) => {
       try {
         await axios.patch(`/api/v1/jobs/${jobID}`, formData, {
@@ -65,10 +66,11 @@ const jobAPI = {
         return { ...formData, jobID };
       } catch (error) {
         return thunkAPI.rejectWithValue(
-          error.response?.data?.message || 'Update job failed'
+          (error as AxiosError<JobError>).response?.data?.msg ||
+            'Update job failed',
         );
       }
-    }
+    },
   ),
   deleleJob: createAsyncThunk('delete/job', async (jobID: string, thunkAPI) => {
     try {
@@ -80,7 +82,8 @@ const jobAPI = {
       return jobID;
     } catch (error) {
       return thunkAPI.rejectWithValue(
-        error.response?.data?.message || 'Delete job failed'
+        (error as AxiosError<JobError>).response?.data?.msg ||
+          'Delete job failed',
       );
     }
   }),

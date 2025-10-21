@@ -1,93 +1,36 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import CompanyInfo from '../models/CompanyInfo.js';
-import File from '../models/File.js';
 import { StatusCodes } from 'http-status-codes';
 import {
   BadRequestError,
   NotFoundError,
   UnauthenticatedError,
 } from '../errors/index.js';
-import { cleanupOnError } from '../utils/cleanupOnError.js';
-
-export interface FileInfo {
-  filename: string;
-  originalname: string;
-  purpose: string;
-  mimetype: string;
-  size: number;
-  path: string;
-  url: string;
-}
 
 const registerCompany = async (req: Request, res: Response) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
-
-  const files = req.files as Express.Multer.File[] | undefined;
-  let registrationDocs: Array<FileInfo> = [];
-  let createdFileIds: string[] = [];
-
-  try {
-    if (!req.user || req.user.role !== 'employer') {
-      throw new UnauthenticatedError('Unauthorized');
-    }
-    const userId = req.user.userId;
-
-    const existingCompany = await CompanyInfo.findOne({
-      employer: userId,
-    }).session(session);
-
-    if (existingCompany) {
-      throw new BadRequestError('Company already exists');
-    }
-
-    registrationDocs =
-      files?.map((f) => ({
-        filename: f.filename,
-        originalname: f.originalname,
-        purpose: 'registrationDocs',
-        mimetype: f.mimetype,
-        size: f.size,
-        path: f.path,
-        url: f.path,
-        createdBy: userId,
-      })) || [];
-
-    const fileDocs = await File.create(registrationDocs, { session });
-    createdFileIds = fileDocs.map((doc) => doc._id.toString());
-
-    const data = await CompanyInfo.create(
-      [
-        {
-          ...req.body,
-          registrationDocs: createdFileIds,
-          employer: userId,
-        },
-      ],
-      { session }
-    );
-
-    await session.commitTransaction();
-
-    res.status(StatusCodes.CREATED).json({
-      isRegistered: true,
-      data: data[0],
-    });
-  } catch (error) {
-    await session.abortTransaction();
-
-    await cleanupOnError(
-      registrationDocs.map((f) => f.path),
-      createdFileIds,
-      error as Error
-    );
-  } finally {
-    await session.endSession();
-    if (session.inTransaction()) {
-      await session.abortTransaction();
-    }
+  if (!req.user || req.user.role !== 'employer' || !req.user.userId) {
+    throw new UnauthenticatedError('Unauthorized');
   }
+  const userId = req.user.userId;
+
+  const existingCompany = await CompanyInfo.findOne({
+    employer: userId,
+  });
+
+  if (existingCompany) {
+    throw new BadRequestError('Company already exists');
+  }
+  const data = await CompanyInfo.create([
+    {
+      ...req.body,
+      employer: userId,
+    },
+  ]);
+  res.status(StatusCodes.CREATED).json({
+    isRegistered: true,
+    data: data,
+  });
 };
 
 const getCompany = async (req: Request, res: Response) => {

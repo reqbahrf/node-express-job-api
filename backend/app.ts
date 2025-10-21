@@ -18,6 +18,7 @@ import authMiddleware from './middleware/authenticated.js';
 import expressSanitizer from './middleware/expressSanitizer.js';
 
 // routers
+import fileRouter from './routes/fileHandler.js';
 import authRouter from './routes/auth.js';
 import jobRouter from './routes/jobs.js';
 import companyRouter from './routes/company.js';
@@ -67,6 +68,7 @@ app.use('/api/v1/jobs', authMiddleware, expressSanitizer, jobRouter);
 app.use('/api/v1/company', authMiddleware, expressSanitizer, companyRouter);
 app.use(/^(?!\/api\/).*/, notFoundMiddleware);
 
+app.use('/api/file/', authMiddleware, fileRouter);
 // Error handling
 app.use(errorHandlerMiddleware);
 

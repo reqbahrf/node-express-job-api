@@ -18,14 +18,13 @@ export const companyAPI = {
       formData,
       accessToken,
     }: {
-      formData: FormData;
+      formData: object;
       accessToken: string;
     }) => {
       const { data } = await toast.promise(
         axios.post<CompanyState>('/api/v1/company/register-company', formData, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            'Content-Type': 'multipart/form-data',
           },
         }),
         {

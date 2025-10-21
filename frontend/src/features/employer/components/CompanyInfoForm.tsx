@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from '@/app/store';
 import { setActiveView } from '@/features/ui/uiSlice';
 import { companyAPI } from '../companyAPI';
 import { Link } from 'react-router-dom';
+import fileAPI from '@/features/filehandler/fileAPI';
 
 export interface CompanyInfoFormState {
   companyName: string;
@@ -26,7 +27,7 @@ export interface CompanyInfoFormState {
   contactEmail: string;
   contactPhone: string;
   logoUrl: string;
-  registrationDocs: File[];
+  registrationDocs: string[];
 }
 
 const CompanyInfoForm = () => {
@@ -44,6 +45,14 @@ const CompanyInfoForm = () => {
     logoUrl: '',
     registrationDocs: [],
   });
+  const [registrationFiles, setRegistrationFiles] = useState<File[]>([]);
+  const [uploadingFiles, setUploadingFiles] = useState<
+    {
+      file: File;
+      progress: number;
+      status: 'idle' | 'uploading' | 'success' | 'error';
+    }[]
+  >([]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -52,17 +61,71 @@ const CompanyInfoForm = () => {
     setCompanyFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCompanyFormData((prev) => ({
-      ...prev,
-      registrationDocs: [
-        ...prev.registrationDocs,
-        ...Array.from(e.target.files as FileList),
-      ],
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+
+    const files = Array.from(e.target.files);
+
+    const newUploads = files.map((file) => ({
+      file,
+      progress: 0,
+      status: 'idle' as const,
     }));
+
+    setUploadingFiles((prev) => [...prev, ...newUploads]);
+    const uploadPromises = newUploads.map(async (upload, index) => {
+      const fileIndex = uploadingFiles.length + index;
+
+      try {
+        setUploadingFiles((prev) => {
+          const updated = [...prev];
+          updated[fileIndex] = { ...updated[fileIndex], status: 'uploading' };
+          return updated;
+        });
+
+        const result = await dispatch(
+          fileAPI.uploadFile({
+            file: upload.file,
+            purpose: 'registrationDocs',
+          }),
+        ).unwrap();
+
+        setRegistrationFiles((prev) => [...prev, upload.file]);
+
+        setUploadingFiles((prev) => {
+          const updated = [...prev];
+          updated[fileIndex] = { ...updated[fileIndex], status: 'success' };
+          return updated;
+        });
+
+        setCompanyFormData((prev) => ({
+          ...prev,
+          registrationDocs: [
+            ...prev.registrationDocs,
+            ...result.map((f) => f._id),
+          ],
+        }));
+      } catch (error) {
+        console.error('Upload failed:', error);
+        setUploadingFiles((prev) => {
+          const updated = [...prev];
+          updated[fileIndex] = { ...updated[fileIndex], status: 'error' };
+          return updated;
+        });
+        throw error;
+      }
+    });
+
+    try {
+      await Promise.all(uploadPromises);
+    } catch (error) {
+      // Individual file errors are handled above
+      console.error('Some files failed to upload');
+    }
   };
 
   const handleRemoveFile = (index: number) => {
+    setRegistrationFiles((prev) => prev.filter((_, i) => i !== index));
     setCompanyFormData((prev) => ({
       ...prev,
       registrationDocs: prev.registrationDocs.filter((_, i) => i !== index),
@@ -75,20 +138,9 @@ const CompanyInfoForm = () => {
     dispatch(setLoading(dispatchPayload));
 
     try {
-      const formData = new FormData();
-      (Object.keys(companyFormData) as (keyof CompanyInfoFormState)[]).forEach(
-        (key) => {
-          if (key !== 'registrationDocs') {
-            formData.append(key, companyFormData[key] as string);
-          }
-        },
-      );
-
-      if (companyFormData.registrationDocs) {
-        Array.from(companyFormData.registrationDocs).forEach((file) => {
-          formData.append('registrationDocs', file);
-        });
-      }
+      const formData = {
+        ...companyFormData,
+      };
       await dispatch(companyAPI.registerCompany({ formData, accessToken }));
     } catch (error) {
       console.error(error);
@@ -236,9 +288,9 @@ const CompanyInfoForm = () => {
               Registration Documents
             </label>
             <div className='mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pt-5 pb-6 dark:border-gray-600'>
-              <div className='space-y-1 text-center'>
+              <div className='w-full space-y-4 text-center'>
                 <RiFileTextLine className='mx-auto h-12 w-12 text-gray-400' />
-                <div className='flex text-sm text-gray-600 dark:text-gray-400'>
+                <div className='flex justify-center text-sm text-gray-600 dark:text-gray-400'>
                   <label
                     htmlFor='registrationDocs'
                     className='relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 focus-within:outline-none hover:text-blue-500 dark:bg-gray-700'
@@ -252,6 +304,9 @@ const CompanyInfoForm = () => {
                       accept='.pdf,.jpg,.png,.jpeg,.doc,.docx'
                       onChange={handleFileChange}
                       className='sr-only'
+                      disabled={uploadingFiles.some(
+                        (f) => f.status === 'uploading',
+                      )}
                     />
                   </label>
                   <p className='pl-1'>or drag and drop</p>
@@ -259,36 +314,79 @@ const CompanyInfoForm = () => {
                 <p className='text-xs text-gray-500 dark:text-gray-400'>
                   PDF, JPG, PNG up to 10MB
                 </p>
+
+                {/* Upload progress */}
+                {uploadingFiles.length > 0 && (
+                  <div className='mt-4 space-y-2 text-left'>
+                    {uploadingFiles.map((upload, index) => (
+                      <div key={index} className='text-sm'>
+                        <div className='flex items-center justify-between'>
+                          <span className='truncate'>{upload.file.name}</span>
+                          <button
+                            type='button'
+                            onClick={() => {
+                              setUploadingFiles((prev) =>
+                                prev.filter((_, i) => i !== index),
+                              );
+                              setRegistrationFiles((prev) =>
+                                prev.filter((_, i) => i !== index),
+                              );
+                            }}
+                            className='ml-2 text-red-500 hover:text-red-700'
+                            disabled={upload.status === 'uploading'}
+                          >
+                            <RiCloseLine className='h-4 w-4' />
+                          </button>
+                        </div>
+                        <div className='mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700'>
+                          <div
+                            className={`h-full ${
+                              upload.status === 'success'
+                                ? 'bg-green-500'
+                                : upload.status === 'error'
+                                  ? 'bg-red-500'
+                                  : 'bg-blue-500'
+                            }`}
+                            style={{
+                              width: `${upload.status === 'uploading' ? upload.progress : 100}%`,
+                              transition: 'width 0.3s ease-in-out',
+                            }}
+                          />
+                        </div>
+                        <div className='mt-1 text-xs text-gray-500'>
+                          {upload.status === 'uploading' && 'Uploading...'}
+                          {upload.status === 'success' &&
+                            'Uploaded successfully'}
+                          {upload.status === 'error' && 'Upload failed'}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
-          {companyFormData.registrationDocs &&
-            companyFormData.registrationDocs.length > 0 && (
-              <ul className='mt-3 text-sm text-gray-700 dark:text-gray-300'>
-                {Array.from(companyFormData.registrationDocs).map(
-                  (file, index) => (
-                    <li
-                      key={index}
-                      className='flex items-center justify-between'
+          {registrationFiles && registrationFiles.length > 0 && (
+            <ul className='mt-3 text-sm text-gray-700 dark:text-gray-300'>
+              {Array.from(registrationFiles).map((file, index) => (
+                <li key={index} className='flex items-center justify-between'>
+                  <span>{file.name}</span>
+                  <div className='flex items-center'>
+                    <span className='text-xs text-gray-400'>
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </span>
+                    <button
+                      type='button'
+                      onClick={() => handleRemoveFile(index)}
+                      className='ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
                     >
-                      <span>{file.name}</span>
-                      <div className='flex items-center'>
-                        <span className='text-xs text-gray-400'>
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </span>
-                        <button
-                          type='button'
-                          onClick={() => handleRemoveFile(index)}
-                          className='ml-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
-                        >
-                          <RiCloseLine />
-                        </button>
-                      </div>
-                    </li>
-                  ),
-                )}
-              </ul>
-            )}
+                      <RiCloseLine />
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
           <div className='pt-4'>
             <button
               type='submit'

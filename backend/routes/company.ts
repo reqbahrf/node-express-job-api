@@ -8,16 +8,13 @@ import {
 } from '../controllers/company.js';
 const router = Router();
 
-router.post(
-  '/register-company',
-  createUpload('private', 'company', /\.(jpg|jpeg|png|pdf|doc|docx)$/).array(
-    'registrationDocs',
-    5
-  ),
-  registerCompany
-);
+//Employer Route
+router.post('/register-company', registerCompany);
+//Admin Route
 router.put('/update-status/:id', updateCompanyStatus);
 router.get('/get-companies', getCompanies);
+
+//Employer Route
 router.get('/get-company/:id', getCompany);
 
 export default router;

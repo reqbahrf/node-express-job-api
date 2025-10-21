@@ -1,0 +1,28 @@
+interface FileUploadConfig {
+  purpose: string;
+  maxFiles: number;
+  allowedTypes?: RegExp | string[];
+  maxFileSizeMB?: number;
+  storageType: 'temp' | 'public' | 'private';
+  destination: string;
+}
+
+const ALLOWED_FILES_PURPOSE_CONFIG: FileUploadConfig[] = [
+  {
+    purpose: 'registrationDocs',
+    maxFiles: 1,
+    allowedTypes: /\.(pdf|doc|docx)$/,
+    maxFileSizeMB: 10,
+    storageType: 'private',
+    destination: 'company',
+  },
+  {
+    purpose: 'update-file',
+    maxFiles: 1,
+    maxFileSizeMB: 10,
+    storageType: 'temp',
+    destination: 'uploads',
+  },
+];
+
+export default ALLOWED_FILES_PURPOSE_CONFIG;
