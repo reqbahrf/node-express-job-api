@@ -10,7 +10,7 @@ const router = Router();
 
 router.post('/upload/:purpose', getUploadMiddlewares, uploadFiles);
 router.post('/update', getUploadMiddlewares, updateFile);
-router.post('/delete', deleteFile);
+router.post('/delete/:id', deleteFile);
 router.get('/view/:type/:fileName', viewFile);
 
 export default router;

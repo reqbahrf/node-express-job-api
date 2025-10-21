@@ -10,6 +10,7 @@ import {
   RiFileTextLine,
   RiCloseLine,
 } from '@remixicon/react';
+import toast from 'react-hot-toast';
 import Input from '@/components/Input';
 import { setLoading } from '../../loading/loadingSlice';
 import { useAppDispatch, useAppSelector } from '@/app/store';
@@ -45,12 +46,12 @@ const CompanyInfoForm = () => {
     logoUrl: '',
     registrationDocs: [],
   });
-  const [registrationFiles, setRegistrationFiles] = useState<File[]>([]);
-  const [uploadingFiles, setUploadingFiles] = useState<
+  const [uploadingFilesStatus, setUploadingFilesStatus] = useState<
     {
+      serverId: string;
       file: File;
       progress: number;
-      status: 'idle' | 'uploading' | 'success' | 'error';
+      status: 'idle' | 'uploading' | 'completed' | 'error';
     }[]
   >([]);
 
@@ -61,75 +62,75 @@ const CompanyInfoForm = () => {
     setCompanyFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  //FIXME: function fail to handle multiple files it fail to update the currect file with its server id.
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
+    if (!e.target.files?.length) return;
 
     const files = Array.from(e.target.files);
-
-    const newUploads = files.map((file) => ({
+    const newFiles = files.map((file) => ({
+      serverId: '',
       file,
       progress: 0,
-      status: 'idle' as const,
+      status: 'uploading' as const,
     }));
 
-    setUploadingFiles((prev) => [...prev, ...newUploads]);
-    const uploadPromises = newUploads.map(async (upload, index) => {
-      const fileIndex = uploadingFiles.length + index;
-
-      try {
-        setUploadingFiles((prev) => {
-          const updated = [...prev];
-          updated[fileIndex] = { ...updated[fileIndex], status: 'uploading' };
-          return updated;
-        });
-
-        const result = await dispatch(
-          fileAPI.uploadFile({
-            file: upload.file,
-            purpose: 'registrationDocs',
-          }),
-        ).unwrap();
-
-        setRegistrationFiles((prev) => [...prev, upload.file]);
-
-        setUploadingFiles((prev) => {
-          const updated = [...prev];
-          updated[fileIndex] = { ...updated[fileIndex], status: 'success' };
-          return updated;
-        });
-
-        setCompanyFormData((prev) => ({
-          ...prev,
-          registrationDocs: [
-            ...prev.registrationDocs,
-            ...result.map((f) => f._id),
-          ],
-        }));
-      } catch (error) {
-        console.error('Upload failed:', error);
-        setUploadingFiles((prev) => {
-          const updated = [...prev];
-          updated[fileIndex] = { ...updated[fileIndex], status: 'error' };
-          return updated;
-        });
-        throw error;
-      }
-    });
+    setUploadingFilesStatus((prev) => [...prev, ...newFiles]);
 
     try {
-      await Promise.all(uploadPromises);
+      const resultAction = await dispatch(
+        fileAPI.uploadFile({
+          fileData: e.target.files,
+          purpose: 'registrationDocs',
+          onUploadProgress: (progress) => {
+            setUploadingFilesStatus((prev) =>
+              prev.map((item, idx) =>
+                idx >= prev.length - files.length
+                  ? { ...item, progress }
+                  : item,
+              ),
+            );
+          },
+        }),
+      );
+
+      if (fileAPI.uploadFile.fulfilled.match(resultAction)) {
+        const uploadedFiles = resultAction.payload;
+        setUploadingFilesStatus((prev) =>
+          prev.map((item, idx) => ({
+            ...item,
+            status: 'completed' as const,
+            serverId: uploadedFiles[idx]?._id || '',
+            progress: 100,
+          })),
+        );
+      } else if (fileAPI.uploadFile.rejected.match(resultAction)) {
+        const error = resultAction.payload as string;
+        setUploadingFilesStatus((prev) =>
+          prev.map((item) => ({
+            ...item,
+            status: 'error' as const,
+            error: error || 'Upload failed',
+          })),
+        );
+        toast.error(`Upload failed: ${error}`);
+      }
     } catch (error) {
-      // Individual file errors are handled above
-      console.error('Some files failed to upload');
+      console.error('Upload error:', error);
+      toast.error('An unexpected error occurred during file upload');
+    } finally {
+      // Clear file input
+      e.target.value = '';
     }
   };
 
-  const handleRemoveFile = (index: number) => {
-    setRegistrationFiles((prev) => prev.filter((_, i) => i !== index));
-    setCompanyFormData((prev) => ({
-      ...prev,
-      registrationDocs: prev.registrationDocs.filter((_, i) => i !== index),
-    }));
+  //TODO: need testing
+  const handleRemoveFile = async (serverid: string) => {
+    const resultAction = await dispatch(fileAPI.deleteFile(serverid));
+    if (fileAPI.deleteFile.fulfilled.match(resultAction)) {
+      setUploadingFilesStatus((prev) =>
+        prev.filter((f) => f.serverId !== serverid),
+      );
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -140,6 +141,7 @@ const CompanyInfoForm = () => {
     try {
       const formData = {
         ...companyFormData,
+        registrationDocs: uploadingFilesStatus.map((f) => f.serverId),
       };
       await dispatch(companyAPI.registerCompany({ formData, accessToken }));
     } catch (error) {
@@ -304,7 +306,7 @@ const CompanyInfoForm = () => {
                       accept='.pdf,.jpg,.png,.jpeg,.doc,.docx'
                       onChange={handleFileChange}
                       className='sr-only'
-                      disabled={uploadingFiles.some(
+                      disabled={uploadingFilesStatus.some(
                         (f) => f.status === 'uploading',
                       )}
                     />
@@ -316,32 +318,32 @@ const CompanyInfoForm = () => {
                 </p>
 
                 {/* Upload progress */}
-                {uploadingFiles.length > 0 && (
+                {uploadingFilesStatus.length > 0 && (
                   <div className='mt-4 space-y-2 text-left'>
-                    {uploadingFiles.map((upload, index) => (
+                    {uploadingFilesStatus.map((upload, index) => (
                       <div key={index} className='text-sm'>
                         <div className='flex items-center justify-between'>
                           <span className='truncate'>{upload.file.name}</span>
-                          <button
-                            type='button'
-                            onClick={() => {
-                              setUploadingFiles((prev) =>
-                                prev.filter((_, i) => i !== index),
-                              );
-                              setRegistrationFiles((prev) =>
-                                prev.filter((_, i) => i !== index),
-                              );
-                            }}
-                            className='ml-2 text-red-500 hover:text-red-700'
-                            disabled={upload.status === 'uploading'}
-                          >
-                            <RiCloseLine className='h-4 w-4' />
-                          </button>
+                          <div className='flex items-center'>
+                            <span className='text-xs text-gray-400'>
+                              {(upload.file.size / 1024 / 1024).toFixed(2)} MB
+                            </span>
+                            <button
+                              type='button'
+                              onClick={() => {
+                                handleRemoveFile(upload.serverId);
+                              }}
+                              className='ml-2 text-red-500 hover:text-red-700'
+                              disabled={upload.status === 'uploading'}
+                            >
+                              <RiCloseLine className='h-4 w-4' />
+                            </button>
+                          </div>
                         </div>
                         <div className='mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700'>
                           <div
                             className={`h-full ${
-                              upload.status === 'success'
+                              upload.status === 'completed'
                                 ? 'bg-green-500'
                                 : upload.status === 'error'
                                   ? 'bg-red-500'
@@ -355,7 +357,7 @@ const CompanyInfoForm = () => {
                         </div>
                         <div className='mt-1 text-xs text-gray-500'>
                           {upload.status === 'uploading' && 'Uploading...'}
-                          {upload.status === 'success' &&
+                          {upload.status === 'completed' &&
                             'Uploaded successfully'}
                           {upload.status === 'error' && 'Upload failed'}
                         </div>
@@ -366,7 +368,7 @@ const CompanyInfoForm = () => {
               </div>
             </div>
           </div>
-          {registrationFiles && registrationFiles.length > 0 && (
+          {/* {registrationFiles && registrationFiles.length > 0 && (
             <ul className='mt-3 text-sm text-gray-700 dark:text-gray-300'>
               {Array.from(registrationFiles).map((file, index) => (
                 <li key={index} className='flex items-center justify-between'>
@@ -386,7 +388,7 @@ const CompanyInfoForm = () => {
                 </li>
               ))}
             </ul>
-          )}
+          )} */}
           <div className='pt-4'>
             <button
               type='submit'

@@ -3,7 +3,7 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig([
-  globalIgnores(['**/node_modules/**', '**/dist/**']),
+  globalIgnores(['node_modules', 'dist']),
   {
     files: ['backend/**/*.{ts,js}'],
     languageOptions: {

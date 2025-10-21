@@ -10,7 +10,7 @@ interface FileUploadConfig {
 const ALLOWED_FILES_PURPOSE_CONFIG: FileUploadConfig[] = [
   {
     purpose: 'registrationDocs',
-    maxFiles: 1,
+    maxFiles: 3,
     allowedTypes: /\.(pdf|doc|docx)$/,
     maxFileSizeMB: 10,
     storageType: 'private',

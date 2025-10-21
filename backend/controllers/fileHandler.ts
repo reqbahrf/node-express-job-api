@@ -24,8 +24,8 @@ export interface FileInfo {
 }
 
 const uploadFiles = async (req: Request, res: Response) => {
-  const session = await mongoose.startSession();
-  session.startTransaction();
+  // const session = await mongoose.startSession();
+  // session.startTransaction();
 
   const purpose = req.params.purpose;
   const userId = req.user?.userId;
@@ -62,17 +62,17 @@ const uploadFiles = async (req: Request, res: Response) => {
       createdBy: userId,
     }));
 
-    const fileDocs = await File.create(filesMetaData, { session });
+    const fileDocs = await File.create(filesMetaData);
     createdFileIds = fileDocs.map((f) => f._id.toString());
 
-    await session.commitTransaction();
+    // await session.commitTransaction();
 
     return res.status(StatusCodes.CREATED).json({
       msg: 'Files uploaded successfully.',
       files: fileDocs,
     });
   } catch (error) {
-    await session.abortTransaction();
+    // await session.abortTransaction();
 
     await cleanupOnError(
       filesMetaData.map((f) => f.path),
@@ -81,11 +81,11 @@ const uploadFiles = async (req: Request, res: Response) => {
     );
 
     throw error;
-  } finally {
-    await session.endSession();
-    if (session.inTransaction()) {
-      await session.abortTransaction();
-    }
+    // } finally {
+    // await session.endSession();
+    // if (session.inTransaction()) {
+    //   await session.abortTransaction();
+    // }
   }
 };
 
@@ -115,13 +115,19 @@ const updateFile = async (req: Request, res: Response) => {
 };
 
 const deleteFile = async (req: Request, res: Response) => {
-  const { filePath } = req.body;
+  const { id } = req.params;
 
-  if (!filePath) {
-    throw new BadRequestError('File path is required.');
+  if (!id) {
+    throw new BadRequestError('File id is required.');
   }
 
-  const absolutePath = path.join(process.cwd(), filePath);
+  const file = await File.findById(id);
+
+  if (!file) {
+    throw new NotFoundError('File not found.');
+  }
+
+  const absolutePath = path.join(process.cwd(), file.path);
 
   if (fs.existsSync(absolutePath)) {
     fs.unlinkSync(absolutePath);
