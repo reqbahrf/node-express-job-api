@@ -82,8 +82,8 @@ const _uploadMiddlewares = ALLOWED_FILES_PURPOSE_CONFIG.reduce(
     );
     const upload =
       config.maxFiles === 1
-        ? middleware.single('file')
-        : middleware.array('file', config.maxFiles);
+        ? middleware.single('files')
+        : middleware.array('files', config.maxFiles);
     acc[config.purpose] = upload;
     return acc;
   },

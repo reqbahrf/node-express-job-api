@@ -4,12 +4,14 @@ import getAccessToken from '../../utils/getAccessToken';
 import { setLoading } from '../../features/loading/loadingSlice';
 
 interface UploadFileParams {
-  fileData: File | FileList;
+  formData: FormData;
   purpose: string;
+  onUploadProgress: (progress: number, localId: string) => void;
 }
 
 interface FileMetaData {
-  _id: string;
+  serverId: string;
+  localId: string;
   filename: string;
   originalname: string;
   purpose: string;
@@ -32,21 +34,9 @@ const fileAPI = {
   uploadFile: createAsyncThunk(
     'file/upload',
     async (
-      {
-        fileData,
-        purpose,
-        onUploadProgress,
-      }: UploadFileParams & { onUploadProgress?: (progress: number) => void },
+      { formData, purpose, onUploadProgress }: UploadFileParams,
       thunkAPI,
     ) => {
-      const formData = new FormData();
-      const files =
-        fileData instanceof File ? [fileData] : Array.from(fileData);
-
-      files.forEach((file) => {
-        formData.append('file', file);
-      });
-
       thunkAPI.dispatch(setLoading({ key: 'fileUpload', loading: true }));
 
       try {
@@ -63,7 +53,13 @@ const fileAPI = {
                 const progress = Math.round(
                   (progressEvent.loaded * 100) / progressEvent.total,
                 );
-                onUploadProgress(progress);
+
+                const localIds = formData.getAll('localIds');
+                if (onUploadProgress) {
+                  localIds.forEach((localId) => {
+                    onUploadProgress(progress, localId as string);
+                  });
+                }
               }
             },
           },

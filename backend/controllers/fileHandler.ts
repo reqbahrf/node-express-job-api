@@ -31,6 +31,7 @@ const uploadFiles = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
   const singleFile = req.file as Express.Multer.File | undefined;
   const multipleFiles = req.files as Express.Multer.File[] | undefined;
+  const localIds = req.body.localIds as string[] | string | undefined;
 
   let filesMetaData: FileInfo[] = [];
   let createdFileIds: string[] = [];
@@ -46,6 +47,18 @@ const uploadFiles = async (req: Request, res: Response) => {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ message: 'No files uploaded.' });
+    }
+
+    const localIdsArray = Array.isArray(localIds)
+      ? localIds
+      : localIds
+        ? [localIds]
+        : [];
+
+    if (localIdsArray.length !== uploadedFiles.length) {
+      throw new BadRequestError(
+        'Number of files does not match number of localId'
+      );
     }
 
     if (!userId) {
@@ -65,11 +78,23 @@ const uploadFiles = async (req: Request, res: Response) => {
     const fileDocs = await File.create(filesMetaData);
     createdFileIds = fileDocs.map((f) => f._id.toString());
 
+    const response = fileDocs.map((doc, index) => ({
+      serverId: doc._id,
+      localId: localIdsArray[index],
+      filename: doc.filename,
+      originalname: doc.originalname,
+      purpose: doc.purpose,
+      mimetype: doc.mimetype,
+      size: doc.size,
+      path: doc.path,
+      url: doc.url,
+      createdBy: doc.createdBy,
+    }));
     // await session.commitTransaction();
 
     return res.status(StatusCodes.CREATED).json({
       msg: 'Files uploaded successfully.',
-      files: fileDocs,
+      filesMeta: response,
     });
   } catch (error) {
     // await session.abortTransaction();

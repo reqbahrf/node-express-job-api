@@ -48,6 +48,7 @@ const CompanyInfoForm = () => {
   });
   const [uploadingFilesStatus, setUploadingFilesStatus] = useState<
     {
+      localId: string;
       serverId: string;
       file: File;
       progress: number;
@@ -68,6 +69,7 @@ const CompanyInfoForm = () => {
 
     const files = Array.from(e.target.files);
     const newFiles = files.map((file) => ({
+      localId: Math.random().toString(36).substring(2, 15),
       serverId: '',
       file,
       progress: 0,
@@ -76,17 +78,20 @@ const CompanyInfoForm = () => {
 
     setUploadingFilesStatus((prev) => [...prev, ...newFiles]);
 
+    const formData = new FormData();
+    newFiles.forEach((file) => {
+      formData.append('files', file.file);
+      formData.append('localIds', file.localId);
+    });
     try {
       const resultAction = await dispatch(
         fileAPI.uploadFile({
-          fileData: e.target.files,
+          formData,
           purpose: 'registrationDocs',
-          onUploadProgress: (progress) => {
+          onUploadProgress: (progress, localId) => {
             setUploadingFilesStatus((prev) =>
-              prev.map((item, idx) =>
-                idx >= prev.length - files.length
-                  ? { ...item, progress }
-                  : item,
+              prev.map((item) =>
+                item.localId === localId ? { ...item, progress } : item,
               ),
             );
           },
@@ -96,12 +101,20 @@ const CompanyInfoForm = () => {
       if (fileAPI.uploadFile.fulfilled.match(resultAction)) {
         const uploadedFiles = resultAction.payload;
         setUploadingFilesStatus((prev) =>
-          prev.map((item, idx) => ({
-            ...item,
-            status: 'completed' as const,
-            serverId: uploadedFiles[idx]?._id || '',
-            progress: 100,
-          })),
+          prev.map((item) => {
+            const uploadedFile = uploadedFiles.find(
+              (uf) => uf.localId === item.localId,
+            );
+
+            return uploadedFile
+              ? {
+                  ...item,
+                  status: 'completed' as const,
+                  serverId: uploadedFile.serverId,
+                  progress: 100,
+                }
+              : item;
+          }),
         );
       } else if (fileAPI.uploadFile.rejected.match(resultAction)) {
         const error = resultAction.payload as string;
