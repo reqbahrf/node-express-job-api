@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import createUpload from '../middleware/upload.js';
 import {
   registerCompany,
   updateCompanyStatus,

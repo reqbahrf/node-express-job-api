@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { StatusCodes } from 'http-status-codes';
 import {
   BadRequestError,
   NotFoundError,
   UnauthenticatedError,
 } from '../errors/index.js';
-import mongoose from 'mongoose';
 import File from '../models/File.js';
 import { cleanupOnError } from '../utils/cleanupOnError.js';
 
@@ -115,27 +115,45 @@ const uploadFiles = async (req: Request, res: Response) => {
 };
 
 const updateFile = async (req: Request, res: Response) => {
-  const { oldFilePath } = req.body;
+  console.log('hit route');
+  const { id } = req.params;
   const file = (req.file as Express.Multer.File) || null;
 
   if (!file) {
-    throw new BadRequestError('File is required.');
-  }
-  if (!oldFilePath) {
-    throw new BadRequestError('Old file path is required.');
+    throw new BadRequestError('Please upload a file.');
   }
 
-  const absoluteOldPath = path.join(process.cwd(), oldFilePath);
+  const oldFile = await File.findById(id);
+
+  if (!oldFile) {
+    throw new NotFoundError('Old file not found.');
+  }
+
+  const absoluteOldPath = path.join(process.cwd(), oldFile.path);
+  const oldDir = path.dirname(absoluteOldPath);
+  const newFileName = `${Date.now()}-${file.filename}`;
+  const newAbsolutePath = path.join(oldDir, newFileName);
+  const newRelativePath = path.relative(process.cwd(), newAbsolutePath);
+  await fs.promises.rename(file.path, newAbsolutePath);
+
   if (fs.existsSync(absoluteOldPath)) {
-    fs.unlinkSync(absoluteOldPath);
+    await fs.promises.unlink(absoluteOldPath);
   }
 
-  const newPath = file.path;
-  const fileUrl = `/storage/${path.relative('storage/app/public', newPath)}`;
+  oldFile.path = newRelativePath;
+  oldFile.filename = newFileName;
+  oldFile.mimetype = file.mimetype;
+  oldFile.size = file.size;
+  oldFile.originalname = file.originalname;
+  await oldFile.save();
+
+  const fileUrl = oldFile.path.startsWith('storage/app/private')
+    ? `/storage/private/${path.relative('storage/app/private', file.path)}`
+    : `/storage/${path.relative('storage/app/public', file.path)}`;
 
   return res.status(StatusCodes.OK).json({
     msg: 'File updated successfully.',
-    file: { filename: file.filename, path: newPath, url: fileUrl },
+    file: { filename: newFileName, path: newRelativePath, url: fileUrl },
   });
 };
 
@@ -155,7 +173,8 @@ const deleteFile = async (req: Request, res: Response) => {
   const absolutePath = path.join(process.cwd(), file.path);
 
   if (fs.existsSync(absolutePath)) {
-    fs.unlinkSync(absolutePath);
+    await fs.promises.unlink(absolutePath);
+    await file.deleteOne();
     return res
       .status(StatusCodes.OK)
       .json({ msg: 'File deleted successfully.' });

@@ -5,12 +5,15 @@ import {
   deleteFile,
   viewFile,
 } from '../controllers/fileHandler.js';
-import getUploadMiddlewares from '../middleware/upload.js';
+import {
+  getUploadMiddlewares,
+  getUpdateFileMiddleware,
+} from '../middleware/upload.js';
 const router = Router();
 
 router.post('/upload/:purpose', getUploadMiddlewares, uploadFiles);
-router.post('/update', getUploadMiddlewares, updateFile);
-router.post('/delete/:id', deleteFile);
+router.put('/update/:id', getUpdateFileMiddleware, updateFile);
+router.delete('/delete/:id', deleteFile);
 router.get('/view/:type/:fileName', viewFile);
 
 export default router;

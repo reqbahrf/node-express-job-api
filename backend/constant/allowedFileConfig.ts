@@ -16,13 +16,6 @@ const ALLOWED_FILES_PURPOSE_CONFIG: FileUploadConfig[] = [
     storageType: 'private',
     destination: 'company',
   },
-  {
-    purpose: 'update-file',
-    maxFiles: 1,
-    maxFileSizeMB: 10,
-    storageType: 'temp',
-    destination: 'uploads',
-  },
 ];
 
 export default ALLOWED_FILES_PURPOSE_CONFIG;

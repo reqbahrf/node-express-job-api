@@ -27,7 +27,7 @@ const _allowedTypeFormater = (regex: RegExp): string => {
     .join(', ');
 };
 
-const createUpload = (
+const _createUpload = (
   storageType: 'public' | 'private' | 'temp',
   destination: string,
   allowedMimeTypes: AllowedMimeTypes = /\.(pdf|jpg|jpeg|png|doc|docx)$/,
@@ -74,7 +74,7 @@ const createUpload = (
 
 const _uploadMiddlewares = ALLOWED_FILES_PURPOSE_CONFIG.reduce(
   (acc, config) => {
-    const middleware = createUpload(
+    const middleware = _createUpload(
       config.storageType,
       config.destination,
       config.allowedTypes,
@@ -90,6 +90,13 @@ const _uploadMiddlewares = ALLOWED_FILES_PURPOSE_CONFIG.reduce(
   {} as Record<string, RequestHandler>
 );
 
+const getUpdateFileMiddleware = _createUpload(
+  'temp',
+  'uploads',
+  /\.(pdf|doc|docx)$/,
+  10
+).single('file');
+
 const getUploadMiddlewares = (
   req: Request,
   res: Response,
@@ -103,4 +110,4 @@ const getUploadMiddlewares = (
   return uploadMiddleware(req, res, next);
 };
 
-export default getUploadMiddlewares;
+export { getUploadMiddlewares, getUpdateFileMiddleware };
