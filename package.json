@@ -7,12 +7,12 @@
   "scripts": {
     "build:backend": "tsc -p backend/tsconfig.json",
     "start": "node backend/dist/server.js",
-    "server": "nodemon --watch backend --ext ts --exec \"npm run build:backend && node backend/dist/server.js\"",
+    "server": "tsx watch backend/server.ts",
     "client": "cd frontend && npm run dev",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm run build:backend && cd frontend && npm run build",
     "preview": "cd frontend && npm run preview",
-    "lint": "eslint .",
+    "lint": "tsc --noEmit",
     "lint:frontend": "cd frontend && npm run lint",
     "lint:backend": "eslint backend --ext .ts"
   },
@@ -44,9 +44,9 @@
     "@types/multer": "^2.0.0",
     "concurrently": "^9.2.1",
     "eslint": "^9.38.0",
-    "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
     "prettier-plugin-tailwindcss": "^0.7.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.x.x",
     "typescript-eslint": "^8.46.1"
   },
