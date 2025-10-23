@@ -16,6 +16,9 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
       userId: decode.userId,
       username: decode.username,
       role: decode.role,
+      isOwner: (resourceId: string) => decode.userId === resourceId,
+      isAllowedToAccess: (allowedRoles: string[]) =>
+        allowedRoles.includes(decode.role),
     };
     next();
   } catch (error) {

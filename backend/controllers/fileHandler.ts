@@ -114,8 +114,10 @@ const uploadFiles = async (req: Request, res: Response) => {
 };
 
 const updateFile = async (req: Request, res: Response) => {
-  console.log('hit route');
-  const { id } = req.params;
+  const {
+    params: { id },
+    user,
+  } = req;
   const file = (req.file as Express.Multer.File) || null;
 
   if (!file) {
@@ -126,6 +128,11 @@ const updateFile = async (req: Request, res: Response) => {
 
   if (!oldFile) {
     throw new NotFoundError('Old file not found.');
+  }
+  if (!user?.isOwner(oldFile?.createdBy.toString())) {
+    throw new UnauthenticatedError(
+      'Unauthorized: Your are not allowed to update this file.'
+    );
   }
 
   const absoluteOldPath = path.join(rootDir, oldFile.path);
@@ -159,7 +166,10 @@ const updateFile = async (req: Request, res: Response) => {
 };
 
 const deleteFile = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const {
+    params: { id },
+    user,
+  } = req;
 
   if (!id) {
     throw new BadRequestError('File id is required.');
@@ -169,6 +179,11 @@ const deleteFile = async (req: Request, res: Response) => {
 
   if (!file) {
     throw new NotFoundError('File not found.');
+  }
+  if (!user?.isOwner(file?.createdBy.toString())) {
+    throw new UnauthenticatedError(
+      'Unauthorized: Your are not allowed to delete this file.'
+    );
   }
 
   const absolutePath = path.join(process.cwd(), file.path);
@@ -185,12 +200,24 @@ const deleteFile = async (req: Request, res: Response) => {
 };
 
 const viewFile = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const {
+    params: { id },
+    user,
+  } = req;
 
   const file = await File.findById(id);
 
   if (!file) {
     throw new NotFoundError('File not found.');
+  }
+
+  if (
+    !user?.isOwner(file?.createdBy.toString()) &&
+    !user?.isAllowedToAccess(['admin'])
+  ) {
+    throw new UnauthenticatedError(
+      'Unauthorized: Your are not allowed to view this file.'
+    );
   }
 
   const absolutePath = path.join(rootDir, file.path);
