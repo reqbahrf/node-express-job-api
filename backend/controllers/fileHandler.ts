@@ -146,13 +146,15 @@ const updateFile = async (req: Request, res: Response) => {
   oldFile.originalname = file.originalname;
   await oldFile.save();
 
-  const fileUrl = oldFile.path.startsWith('storage/app/private')
-    ? `/storage/private/${path.relative('storage/app/private', file.path)}`
-    : `/storage/${path.relative('storage/app/public', file.path)}`;
-
   return res.status(StatusCodes.OK).json({
     msg: 'File updated successfully.',
-    file: { filename: newFileName, path: newRelativePath, url: fileUrl },
+    file: {
+      filename: newFileName,
+      path: newRelativePath,
+      mimetype: file.mimetype,
+      size: file.size,
+      originalname: file.originalname,
+    },
   });
 };
 

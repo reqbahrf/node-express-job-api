@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import cors from 'cors';
 
-import adminUser from './middleware/adminUser.js';
+import adminMiddleware from './middleware/role/admin.js';
 import authMiddleware from './middleware/authenticated.js';
 import expressSanitizer from './middleware/expressSanitizer.js';
 
@@ -57,8 +57,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-app.use('/api/v1/admin', authMiddleware, adminUser, adminRouter);
-// API routes
+app.use('/api/v1/admin', authMiddleware, adminMiddleware, adminRouter);
 app.use('/api/v1/auth', expressSanitizer, authRouter);
 app.use('/api/v1/password', authMiddleware, expressSanitizer, passwordRouter);
 app.use('/api/v1/jobs', authMiddleware, expressSanitizer, jobRouter);

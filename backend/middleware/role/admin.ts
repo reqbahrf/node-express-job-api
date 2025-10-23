@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { UnauthenticatedError } from '../errors/index.js';
-const adminUser = (req: Request, res: Response, next: NextFunction) => {
+import { UnauthenticatedError } from '../../errors/index.js';
+const admin = (req: Request, res: Response, next: NextFunction) => {
   const role = req.user?.role;
   if (role !== 'admin') {
     throw new UnauthenticatedError('Authentication invalid');
@@ -8,4 +8,4 @@ const adminUser = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-export default adminUser;
+export default admin;
