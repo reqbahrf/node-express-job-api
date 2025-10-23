@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { rootDir } from '../utils/pathResolver.js';
 import { StatusCodes } from 'http-status-codes';
 import {
   BadRequestError,
@@ -11,7 +11,6 @@ import {
 import File from '../models/File.js';
 import { cleanupOnError } from '../utils/cleanupOnError.js';
 
-//TODO:Refactor for File model implementation
 export interface FileInfo {
   filename: string;
   originalname: string;
@@ -129,11 +128,11 @@ const updateFile = async (req: Request, res: Response) => {
     throw new NotFoundError('Old file not found.');
   }
 
-  const absoluteOldPath = path.join(process.cwd(), oldFile.path);
+  const absoluteOldPath = path.join(rootDir, oldFile.path);
   const oldDir = path.dirname(absoluteOldPath);
   const newFileName = `${Date.now()}-${file.filename}`;
   const newAbsolutePath = path.join(oldDir, newFileName);
-  const newRelativePath = path.relative(process.cwd(), newAbsolutePath);
+  const newRelativePath = path.relative(rootDir, newAbsolutePath);
   await fs.promises.rename(file.path, newAbsolutePath);
 
   if (fs.existsSync(absoluteOldPath)) {

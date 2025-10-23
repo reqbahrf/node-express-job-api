@@ -4,10 +4,6 @@ import express from 'express';
 const app = express();
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 //security packages
 import helmet from 'helmet';
@@ -28,6 +24,7 @@ import passwordRouter from './routes/password.js';
 // error handler
 import notFoundMiddleware from './middleware/not-found.js';
 import errorHandlerMiddleware from './middleware/error-handler.js';
+import { rootDir } from './utils/pathResolver.js';
 
 // extra packages
 app.set('trust proxy', 1);
@@ -52,11 +49,11 @@ app.use(
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React app
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  app.use(express.static(path.join(rootDir, '/frontend/dist')));
 
   // Handle React routing, return all requests to React's index.html
   app.get(/^(?!\/api\/).*/, (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+    res.sendFile(path.join(rootDir, '/frontend/dist', 'index.html'));
   });
 }
 
