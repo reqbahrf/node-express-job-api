@@ -183,15 +183,15 @@ const deleteFile = async (req: Request, res: Response) => {
 };
 
 const viewFile = async (req: Request, res: Response) => {
-  const { type, fileName } = req.params;
+  const { id } = req.params;
 
-  const basePath =
-    type === 'public' ? 'storage/app/public' : 'storage/app/private';
-  if (!fileName) {
-    throw new BadRequestError('File name is required.');
+  const file = await File.findById(id);
+
+  if (!file) {
+    throw new NotFoundError('File not found.');
   }
 
-  const absolutePath = path.join(process.cwd(), basePath, fileName);
+  const absolutePath = path.join(rootDir, file.path);
 
   if (fs.existsSync(absolutePath)) {
     return res.status(StatusCodes.OK).sendFile(absolutePath);
