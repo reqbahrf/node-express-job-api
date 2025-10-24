@@ -1,10 +1,15 @@
 import mongoose from 'mongoose';
 const JobSchema = new mongoose.Schema(
   {
-    company: {
+    companyName: {
       type: String,
       required: [true, 'Please provide company name'],
       maxLength: 50,
+    },
+    companyInfo: {
+      type: mongoose.Types.ObjectId,
+      ref: 'CompanyInfo',
+      required: [true, 'Please provide company info'],
     },
     position: {
       type: String,

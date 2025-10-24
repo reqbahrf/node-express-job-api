@@ -1,18 +1,10 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
 import CompanyInfo from '../models/CompanyInfo.js';
 import { StatusCodes } from 'http-status-codes';
-import {
-  BadRequestError,
-  NotFoundError,
-  UnauthenticatedError,
-} from '../errors/index.js';
+import { BadRequestError, NotFoundError } from '../errors/index.js';
 
 const registerCompany = async (req: Request, res: Response) => {
-  if (!req.user || req.user.role !== 'employer' || !req.user.userId) {
-    throw new UnauthenticatedError('Unauthorized');
-  }
-  const userId = req.user.userId;
+  const userId = req.user?.userId;
 
   const existingCompany = await CompanyInfo.findOne({
     employer: userId,
@@ -21,6 +13,7 @@ const registerCompany = async (req: Request, res: Response) => {
   if (existingCompany) {
     throw new BadRequestError('Company already exists');
   }
+
   const data = await CompanyInfo.create([
     {
       ...req.body,
@@ -72,10 +65,14 @@ const updateCompanyStatus = async (req: Request, res: Response) => {
 };
 
 const getCompanies = async (req: Request, res: Response) => {
-  const {
-    query: { status },
-  } = req;
-  const companies = await CompanyInfo.find({ status }).populate(
+  const { status } = req.query;
+  const queryObject: { status?: string } = {};
+
+  if (status) {
+    queryObject.status = status as string;
+  }
+
+  const companies = await CompanyInfo.find(queryObject).populate(
     'employer',
     'username email'
   );

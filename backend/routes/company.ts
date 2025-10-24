@@ -12,10 +12,9 @@ const router = Router();
 //Employer Route
 router.post('/register-company', employerMiddleware, registerCompany);
 //Admin Route
-router.put('/update-status/:id', adminMiddleware, updateCompanyStatus);
-router.get('/get-companies', adminMiddleware, getCompanies);
+router.patch('/update-status/:id', adminMiddleware, updateCompanyStatus);
+router.get('/get-companies', getCompanies);
 
-//Employer Route
-router.get('/get-company/:id', employerMiddleware, getCompany);
+router.get('/get-company/:id', getCompany);
 
 export default router;
