@@ -9,7 +9,6 @@ type statResponse = {
 };
 const DashboardView = () => {
   const dispatch = useAppDispatch();
-  const { accessToken } = useAppSelector((state) => state.auth);
   const { userid, user, role } = useAppSelector((state) => state.auth);
   const { userCount } = useSocket(userid || '', role || '');
   const [stats, setStats] = useState<statResponse>({ applicantUserCount: 0 });
@@ -17,8 +16,8 @@ const DashboardView = () => {
   useEffect(() => {
     const controller = new AbortController();
     dispatch(setActiveView('Dashboard'));
-    adminAPI
-      .getAdminDashboardStats(accessToken, controller.signal)
+    dispatch(adminAPI.getAdminDashboardStats(controller.signal))
+      .unwrap()
       .then(setStats)
       .catch((error) => {
         console.error('Failed to fetch stats: ' + error);

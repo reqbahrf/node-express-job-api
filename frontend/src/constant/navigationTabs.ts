@@ -1,7 +1,7 @@
 export const NAVIGATION_TABS = {
   admin: [
     { label: 'Dashboard', link: '/admin/dashboard' },
-    { label: 'Company Requests', link: '/admin/company-requests' },
+    { label: 'Companies', link: '/admin/companies' },
     { label: 'Jobs', link: '/admin/jobs' },
     { label: 'Users', link: '/admin/users' },
   ],
