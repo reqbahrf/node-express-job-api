@@ -15,6 +15,7 @@ const ApplicantDashboardView = lazy(
   () => import('../pages/applicant/DashboardView'),
 );
 const AdminDashboardView = lazy(() => import('../pages/admin/DashboardView'));
+const CompanyView = lazy(() => import('../pages/admin/CompanyView'));
 const EmployerDashboardView = lazy(
   () => import('../pages/employer/DashboardView'),
 );
@@ -109,6 +110,15 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path='/admin/companies'
+          element={
+            <ProtectedRoute allowedRoles={[ROLES.ADMIN]}>
+              {withLayout(AppLayout, <CompanyView />)}
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path='/account'
           element={

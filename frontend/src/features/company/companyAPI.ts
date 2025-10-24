@@ -4,7 +4,7 @@ import type { NavigateFunction } from 'react-router-dom';
 import { setLoading } from '../loading/loadingSlice';
 import { toast } from 'react-hot-toast';
 import getAccessToken from '@/utils/getAccessToken';
-import type { CompanyState } from '../../types/company';
+import type { CompanyInfo, CompanyState } from '../../types/company';
 
 interface GetCompanyInfoPayload {
   companyId: string;
@@ -116,20 +116,16 @@ export const companyAPI = {
       };
       try {
         thunkAPI.dispatch(setLoading(dispatchPayload));
-        const { data } = await toast.promise(
-          axios.get<CompanyState[]>('/api/v1/company/get-companies', {
+        const { data } = await axios.get<{ companies: CompanyInfo[] }>(
+          '/api/v1/company/get-companies',
+          {
             headers: {
               Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
             },
-          }),
-          {
-            loading: 'Fetching companies...',
-            success: 'Companies fetched successfully!',
-            error: (err) =>
-              err.response?.data?.msg || 'Failed to fetch companies',
+            signal: thunkAPI.signal,
           },
         );
-        return data;
+        return data.companies;
       } catch (error: any) {
         return thunkAPI.rejectWithValue(
           error.response?.data?.message || 'Failed to fetch companies',

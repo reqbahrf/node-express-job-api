@@ -7,7 +7,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
     <>
       <Header />
       <NavigationTab />
-      <div className='flex min-h-screen justify-center overflow-x-hidden overflow-y-scroll bg-white pt-10 dark:bg-gray-900'>
+      <div className='flex min-h-screen justify-center overflow-x-hidden overflow-y-scroll bg-white pt-10 dark:bg-gray-950'>
         <div className='mt-[100px] w-full overflow-hidden sm:mx-[20px] md:w-[60%] dark:text-white'>
           <Suspense fallback={<Loading />}>{children}</Suspense>
         </div>
