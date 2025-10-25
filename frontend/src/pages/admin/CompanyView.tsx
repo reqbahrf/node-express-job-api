@@ -1,28 +1,81 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/store';
 import { companyAPI } from '@/features/company/companyAPI';
-import { useState } from 'react';
 import CompanyCard from '../../components/company/CompanyCard';
-import type { CompanyInfo } from '../../types/company';
+import type { CompanyInfo, QueryParams } from '../../types/company';
 import { setActiveView } from '@/features/ui/uiSlice';
 import Loading from '@/components/Loading';
+import Input from '@/components/Input';
 
 const CompanyView = () => {
   const dispatch = useAppDispatch();
   const [companies, setCompanies] = useState<CompanyInfo[]>([]);
-  const { getCompanies } = useAppSelector(
-    (state) => state.loading.loadingState,
+  const [queryParams, setQueryParams] = useState<QueryParams>({});
+  const getCompanies = useAppSelector(
+    (state) => state.loading.loadingState.getCompanies,
   );
+
+  const handleFilterChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
+    const { name, value } = e.target;
+    setQueryParams((prev) => {
+      if (name === 'status' && value === 'all') {
+        const newParams = { ...prev };
+        delete newParams.status;
+        return newParams;
+      }
+      return { ...prev, [name]: value };
+    });
+  };
+
   useEffect(() => {
     dispatch(setActiveView('Companies'));
-    dispatch(companyAPI.getCompanies()).unwrap().then(setCompanies);
-  }, []);
-  if (getCompanies?.loading) return <Loading />;
+    dispatch(companyAPI.getCompanies(queryParams)).unwrap().then(setCompanies);
+  }, [queryParams]);
+
   return (
-    <>
-      {companies.length > 0 &&
-        companies.map((company) => <CompanyCard company={company} />)}
-    </>
+    <div className='p-4'>
+      <div className='mb-4 flex space-x-4'>
+        <Input
+          type='text'
+          name='company'
+          placeholder='Filter by company name'
+          value={queryParams.company || ''}
+          onChange={handleFilterChange}
+          className='w-1/3'
+        />
+        <select
+          name='status'
+          value={queryParams.status || 'all'}
+          onChange={handleFilterChange}
+          className='w-1/3 rounded-md border border-gray-300 bg-white p-2 text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+        >
+          <option value='all'>All Statuses</option>
+          <option value='active'>Active</option>
+          <option value='pending'>Pending</option>
+          <option value='rejected'>Rejected</option>
+        </select>
+        <select
+          name='sortby'
+          value={queryParams.sortby || 'latest'}
+          onChange={handleFilterChange}
+          className='w-1/3 rounded-md border border-gray-300 bg-white p-2 text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white'
+        >
+          <option value='latest'>Latest</option>
+          <option value='oldest'>Oldest</option>
+        </select>
+      </div>
+      {getCompanies?.loading ? (
+        <Loading />
+      ) : companies.length > 0 ? (
+        companies.map((company) => (
+          <CompanyCard key={company._id} company={company} />
+        ))
+      ) : (
+        <p className='mt-4 text-center text-gray-500'>No companies found</p>
+      )}
+    </div>
   );
 };
 
