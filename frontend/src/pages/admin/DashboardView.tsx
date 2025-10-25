@@ -14,17 +14,13 @@ const DashboardView = () => {
   const [stats, setStats] = useState<statResponse>({ applicantUserCount: 0 });
 
   useEffect(() => {
-    const controller = new AbortController();
     dispatch(setActiveView('Dashboard'));
-    dispatch(adminAPI.getAdminDashboardStats(controller.signal))
+    dispatch(adminAPI.getAdminDashboardStats())
       .unwrap()
       .then(setStats)
       .catch((error) => {
         console.error('Failed to fetch stats: ' + error);
       });
-    return () => {
-      controller.abort();
-    };
   }, []);
   return (
     <>
