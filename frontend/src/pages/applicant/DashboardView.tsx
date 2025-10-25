@@ -92,7 +92,7 @@ const DashboardView = () => {
         >
           <UpdateJobModal
             jobID={modal.Job._id}
-            company={modal.Job.company}
+            companyName={modal.Job.companyName}
             position={modal.Job.position}
             status={modal.Job.status || ''}
           />
@@ -106,7 +106,7 @@ const DashboardView = () => {
         >
           <DeleteJobModal
             jobID={modal?.Job._id}
-            company={modal?.Job.company}
+            companyName={modal?.Job.companyName}
             position={modal?.Job.position}
             status={modal?.Job.status || ''}
           />
