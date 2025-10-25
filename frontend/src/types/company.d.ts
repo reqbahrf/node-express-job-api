@@ -15,6 +15,13 @@ export interface CompanyInfo {
   updatedAt?: Date;
 }
 
+export interface QueryParams {
+  company?: string;
+  status?: string;
+  sortby?: string;
+  page?: string;
+}
+
 export interface CompanyState {
   company: CompanyInfo | null;
   isRegistered: boolean;
