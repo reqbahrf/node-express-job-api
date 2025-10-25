@@ -20,6 +20,7 @@ const jobAPI = {
         headers: {
           Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
         },
+        signal: thunkAPI.signal,
       });
       return data;
     } catch (error) {
@@ -40,6 +41,7 @@ const jobAPI = {
             headers: {
               Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
             },
+            signal: thunkAPI.signal,
           },
         );
         return data.job;
@@ -62,6 +64,7 @@ const jobAPI = {
           headers: {
             Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
           },
+          signal: thunkAPI.signal,
         });
         return { ...formData, jobID };
       } catch (error) {
@@ -78,6 +81,7 @@ const jobAPI = {
         headers: {
           Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
         },
+        signal: thunkAPI.signal,
       });
       return jobID;
     } catch (error) {
