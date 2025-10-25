@@ -25,12 +25,12 @@ const jobSlice = createSlice({
       state.jobs.push(action.payload);
     });
     builder.addCase(jobAPI.updateJob.fulfilled, (state, action) => {
-      const { jobID, company, position, status } = action.payload;
+      const { jobID, companyName, position, status } = action.payload;
       const index = state.jobs.findIndex((job) => job._id === jobID);
       if (index !== -1) {
         state.jobs[index] = {
           ...state.jobs[index],
-          company,
+          companyName,
           position,
           status: status || '',
         };

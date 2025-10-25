@@ -5,25 +5,25 @@ import jobAPI from '../../features/job/jobAPI';
 import toast from 'react-hot-toast';
 interface UpdateJobModalProps {
   jobID: string;
-  company: string;
+  companyName: string;
   status: string;
   position: string;
   onClose?: () => void;
 }
 
 const UpdateJobModal = (props: UpdateJobModalProps) => {
-  const { jobID, company, status, position } = props;
+  const { jobID, companyName, status, position } = props;
   const isLoading = useAppSelector(
-    (state) => state.loading.loadingState?.updateJob?.loading
+    (state) => state.loading.loadingState?.updateJob?.loading,
   );
   const dispatch = useAppDispatch();
   const [formData, setFromData] = useState({
-    company,
+    companyName,
     position,
     status,
   });
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     setFromData((prev) => ({
       ...prev,
@@ -50,12 +50,12 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
     <form onSubmit={handleSubmit}>
       <input
         type='text'
-        name='company'
-        id='company'
-        value={formData.company}
+        name='companyName'
+        id='companyName'
+        value={formData.companyName}
         onChange={handleChange}
         placeholder='Company'
-        className='w-full p-2 mb-4 border border-gray-300 rounded'
+        className='mb-4 w-full rounded border border-gray-300 p-2'
       />
       <input
         type='text'
@@ -64,14 +64,14 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
         value={formData.position}
         onChange={handleChange}
         placeholder='Position'
-        className='w-full p-2 mb-4 border border-gray-300 rounded'
+        className='mb-4 w-full rounded border border-gray-300 p-2'
       />
       <select
         name='status'
         id='status'
         value={formData.status}
         onChange={handleChange}
-        className='w-full p-2 mb-4 border bg-white text-black border-gray-300 dark:text-white rounded dark:bg-gray-800'
+        className='mb-4 w-full rounded border border-gray-300 bg-white p-2 text-black dark:bg-gray-800 dark:text-white'
       >
         <option value='pending'>Pending</option>
         <option value='interview'>Interview</option>
@@ -80,7 +80,7 @@ const UpdateJobModal = (props: UpdateJobModalProps) => {
       <button
         type='submit'
         disabled={isLoading}
-        className='bg-blue-400 text-white px-4 py-2 rounded'
+        className='rounded bg-blue-400 px-4 py-2 text-white'
       >
         {isLoading ? 'Updating...' : 'Update'}
       </button>

@@ -4,7 +4,7 @@ import { JobRes } from './jobSlice';
 import { JobInfo } from '../../components/JobCard';
 import getAccessToken from '../../utils/getAccessToken';
 interface FromData {
-  company: string;
+  companyName: string;
   position: string;
   status?: string;
 }

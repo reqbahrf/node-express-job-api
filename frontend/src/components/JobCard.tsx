@@ -2,7 +2,8 @@ import { memo } from 'react';
 
 export interface JobInfo {
   _id: string;
-  company: string;
+  companyName: string;
+  companyInfo: string;
   position: string;
   status: string;
   createdBy: string;
@@ -17,7 +18,8 @@ export interface JobCardProps extends JobInfo {
 }
 const JobCard: React.FC<JobCardProps> = ({
   _id,
-  company,
+  companyName,
+  companyInfo,
   position,
   status,
   createdBy,
@@ -29,7 +31,8 @@ const JobCard: React.FC<JobCardProps> = ({
 }) => {
   const jobInfo = {
     _id,
-    company,
+    companyName,
+    companyInfo,
     position,
     status,
     createdBy,
@@ -41,7 +44,7 @@ const JobCard: React.FC<JobCardProps> = ({
     <div className='grid grid-cols-1 gap-4 rounded-lg bg-white p-6 shadow-md md:grid-cols-[2fr_2fr_auto] dark:bg-gray-900'>
       <div>
         <h2 className='mb-2 border-b text-xl font-bold'>{position}</h2>
-        <p className='mb-2 text-gray-600 dark:text-white'>{company}</p>
+        <p className='mb-2 text-gray-600 dark:text-white'>{companyName}</p>
       </div>
       <div>
         <p className='mb-2 text-gray-600 dark:text-white'>

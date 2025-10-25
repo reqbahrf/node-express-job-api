@@ -6,10 +6,10 @@ import jobAPI from '../../features/job/jobAPI';
 const AddJobModal = (props: { onClose?: () => void }) => {
   const dispatch = useAppDispatch();
   const isLoading = useAppSelector(
-    (state) => state.loading.loadingState?.addJob?.loading
+    (state) => state.loading.loadingState?.addJob?.loading,
   );
   const [formData, setFromData] = useState({
-    company: '',
+    companyName: '',
     position: '',
   });
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,11 +38,11 @@ const AddJobModal = (props: { onClose?: () => void }) => {
     <form onSubmit={handleSubmit}>
       <input
         type='text'
-        name='company'
-        id='company'
+        name='companyName'
+        id='companyName'
         placeholder='Company'
-        className='w-full p-2 mb-4 border dark:border-gray-700 dark:text-white rounded'
-        value={formData.company}
+        className='mb-4 w-full rounded border p-2 dark:border-gray-700 dark:text-white'
+        value={formData.companyName}
         onChange={handleChange}
       />
       <input
@@ -50,14 +50,14 @@ const AddJobModal = (props: { onClose?: () => void }) => {
         name='position'
         id='position'
         placeholder='Position'
-        className='w-full p-2 mb-4 border dark:border-gray-700 dark:text-white rounded'
+        className='mb-4 w-full rounded border p-2 dark:border-gray-700 dark:text-white'
         value={formData.position}
         onChange={handleChange}
       />
       <button
         type='submit'
         disabled={isLoading}
-        className='bg-blue-500 text-white px-4 py-2 rounded'
+        className='rounded bg-blue-500 px-4 py-2 text-white'
       >
         {isLoading ? 'Submitting...' : 'Submit'}
       </button>

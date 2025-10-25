@@ -4,16 +4,16 @@ import jobAPI from '../../features/job/jobAPI';
 import toast from 'react-hot-toast';
 interface DeleteJobModalProps {
   jobID: string;
-  company: string;
+  companyName: string;
   status: string;
   position: string;
   onClose?: () => void;
 }
 const DeleteJobModal = (props: DeleteJobModalProps) => {
   const dispatch = useAppDispatch();
-  const { jobID, company, status, position, onClose } = props;
+  const { jobID, companyName, status, position, onClose } = props;
   const isLoading = useAppSelector(
-    (state) => state.loading.loadingState?.deleteJob?.loading
+    (state) => state.loading.loadingState?.deleteJob?.loading,
   );
   const handleDelete = async (JobId: string) => {
     const dispatchPayload = { key: 'deleteJob', loading: true };
@@ -32,7 +32,7 @@ const DeleteJobModal = (props: DeleteJobModalProps) => {
     <>
       <p>
         Are you sure you want to delete this job for{' '}
-        <span className='font-bold'>{company}</span> -{' '}
+        <span className='font-bold'>{companyName}</span> -{' '}
         <span className='font-bold'>{position}</span> with a current status{' '}
         <span className='font-bold'>{status}</span>?
       </p>
@@ -40,13 +40,13 @@ const DeleteJobModal = (props: DeleteJobModalProps) => {
         <button
           onClick={() => handleDelete(jobID)}
           disabled={isLoading}
-          className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
+          className='rounded-md bg-red-500 px-3 py-1 text-white hover:bg-red-600'
         >
           {isLoading ? 'Deleting...' : 'Delete'}
         </button>
         <button
           onClick={onClose}
-          className='bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-gray-600'
+          className='rounded-md bg-gray-500 px-3 py-1 text-white hover:bg-gray-600'
         >
           Cancel
         </button>
