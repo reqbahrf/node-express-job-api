@@ -48,6 +48,7 @@ const fileAPI = {
               'Content-Type': 'multipart/form-data',
               Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
             },
+            signal: thunkAPI.signal,
             onUploadProgress: (progressEvent) => {
               if (progressEvent.total && onUploadProgress) {
                 const progress = Math.round(
@@ -89,6 +90,7 @@ const fileAPI = {
         headers: {
           Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
         },
+        signal: thunkAPI.signal,
       });
       return response.data;
     } catch (error) {
