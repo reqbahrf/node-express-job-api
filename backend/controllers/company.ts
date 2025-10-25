@@ -3,6 +3,13 @@ import CompanyInfo from '../models/CompanyInfo.js';
 import { StatusCodes } from 'http-status-codes';
 import { BadRequestError, NotFoundError } from '../errors/index.js';
 
+interface SortOption {
+  [key: string]: 1 | -1;
+}
+interface QueryObject {
+  status?: string;
+}
+
 const registerCompany = async (req: Request, res: Response) => {
   const userId = req.user?.userId;
 
@@ -65,17 +72,30 @@ const updateCompanyStatus = async (req: Request, res: Response) => {
 };
 
 const getCompanies = async (req: Request, res: Response) => {
-  const { status } = req.query;
-  const queryObject: { status?: string } = {};
+  const { status, sortBy } = req.query;
+  const queryObject: QueryObject = {};
+  let sortObject: SortOption = { createdAt: -1 };
 
   if (status) {
     queryObject.status = status as string;
   }
 
-  const companies = await CompanyInfo.find(queryObject).populate(
-    'employer',
-    'username email'
-  );
+  if (sortBy) {
+    switch (sortBy) {
+      case 'oldest':
+        sortObject = { createdAt: 1 };
+        break;
+      case 'newest':
+        sortObject = { createdAt: -1 };
+        break;
+      default:
+        break;
+    }
+  }
+
+  const companies = await CompanyInfo.find(queryObject)
+    .populate('employer', 'username email')
+    .sort(sortObject);
   res.status(StatusCodes.OK).json({ companies });
 };
 
