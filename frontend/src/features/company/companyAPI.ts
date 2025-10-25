@@ -4,7 +4,11 @@ import type { NavigateFunction } from 'react-router-dom';
 import { setLoading } from '../loading/loadingSlice';
 import { toast } from 'react-hot-toast';
 import getAccessToken from '@/utils/getAccessToken';
-import type { CompanyInfo, CompanyState } from '../../types/company';
+import type {
+  CompanyInfo,
+  CompanyState,
+  QueryParams,
+} from '../../types/company';
 
 interface GetCompanyInfoPayload {
   companyId: string;
@@ -108,7 +112,7 @@ export const companyAPI = {
   ),
   getCompanies: createAsyncThunk(
     'company/getCompanies',
-    async (_, thunkAPI) => {
+    async (queryParams: QueryParams, thunkAPI) => {
       const dispatchPayload = {
         key: 'getCompanies',
         loading: true,
@@ -116,15 +120,25 @@ export const companyAPI = {
       };
       try {
         thunkAPI.dispatch(setLoading(dispatchPayload));
-        const { data } = await axios.get<{ companies: CompanyInfo[] }>(
-          '/api/v1/company/get-companies',
-          {
-            headers: {
-              Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
-            },
-            signal: thunkAPI.signal,
+
+        const params = new URLSearchParams();
+        for (const key in queryParams) {
+          if (
+            queryParams[key as keyof QueryParams] !== undefined &&
+            queryParams[key as keyof QueryParams] !== ''
+          ) {
+            params.append(key, queryParams[key as keyof QueryParams] as string);
+          }
+        }
+
+        const url = `/api/v1/company/get-companies?${params.toString()}`;
+
+        const { data } = await axios.get<{ companies: CompanyInfo[] }>(url, {
+          headers: {
+            Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
           },
-        );
+          signal: thunkAPI.signal,
+        });
         return data.companies;
       } catch (error: any) {
         return thunkAPI.rejectWithValue(
