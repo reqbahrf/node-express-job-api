@@ -30,6 +30,9 @@ const authAPI = {
         const { data } = await axios.post<ResponseAuthData>(
           '/api/v1/auth/login',
           credentials,
+          {
+            signal: thunkAPI.signal,
+          },
         );
 
         return data;
@@ -46,7 +49,13 @@ const authAPI = {
     const dispatchPayload = { key: 'logout', loading: true, isGlobal: true };
     try {
       thunkAPI.dispatch(setLoading(dispatchPayload));
-      await axios.post('/api/v1/auth/logout');
+      await axios.post(
+        '/api/v1/auth/logout',
+        {},
+        {
+          signal: thunkAPI.signal,
+        },
+      );
       thunkAPI.dispatch(setLoading({ ...dispatchPayload, loading: false }));
       return null;
     } catch (error: any) {
@@ -70,6 +79,9 @@ const authAPI = {
         const { data } = await axios.post<ResponseAuthData>(
           '/api/v1/auth/register',
           credentials,
+          {
+            signal: thunkAPI.signal,
+          },
         );
         return data;
       } catch (err: any) {
@@ -91,6 +103,9 @@ const authAPI = {
       thunkAPI.dispatch(setLoading(dispatchPayload));
       const { data } = await axios.get<ResponseAuthData>(
         '/api/v1/auth/refresh-token',
+        {
+          signal: thunkAPI.signal,
+        },
       );
       return data;
     } catch (error: any) {
