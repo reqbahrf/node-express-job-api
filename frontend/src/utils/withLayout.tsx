@@ -2,7 +2,7 @@ import { ComponentType, ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAppSelector } from '../app/store';
 
-export const withLayout = (
+const WithLayout = (
   Layout: ComponentType<{ children: ReactNode }>,
   page: ReactNode,
 ) => {
@@ -11,3 +11,4 @@ export const withLayout = (
   if (!accessToken) return <Navigate to='/login' />;
   return <Layout>{page}</Layout>;
 };
+export default WithLayout;
