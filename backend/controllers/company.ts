@@ -51,10 +51,11 @@ const getCompany = async (req: Request, res: Response) => {
 
 const updateCompanyStatus = async (req: Request, res: Response) => {
   const {
-    params: id,
+    params: { id },
     body: { status },
   } = req;
 
+  console.log(id, status);
   if (!['approved', 'rejected'].includes(status)) {
     throw new BadRequestError('Invalid status');
   }
