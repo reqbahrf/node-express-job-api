@@ -52,7 +52,7 @@ const CompanyView = () => {
           className='w-1/3 rounded-md border border-gray-300 bg-white p-2 text-black dark:border-gray-600 dark:bg-gray-800 dark:text-white'
         >
           <option value='all'>All Statuses</option>
-          <option value='active'>Active</option>
+          <option value='approved'>Approved</option>
           <option value='pending'>Pending</option>
           <option value='rejected'>Rejected</option>
         </select>
