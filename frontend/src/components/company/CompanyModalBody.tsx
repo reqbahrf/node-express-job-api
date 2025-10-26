@@ -9,7 +9,6 @@ import {
 } from '@remixicon/react';
 
 import { useAppDispatch } from '@/app/store';
-import toast from 'react-hot-toast';
 
 interface CompanyModalBodyProps {
   company: CompanyInfo;
