@@ -46,8 +46,8 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company }) => {
             className={`mt-4 self-start rounded-full px-4 py-1 text-sm font-bold tracking-wide uppercase sm:mt-0 ${
               company.status === 'approved'
                 ? 'bg-green-600 text-white'
-                : 'bg-gray-600 text-white'
-            } group-hover:bg-gray-700`}
+                : 'bg-gray-700 text-white'
+            } `}
           >
             {company.status}
           </span>

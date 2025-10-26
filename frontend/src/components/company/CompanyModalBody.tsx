@@ -96,7 +96,7 @@ const CompanyModalBody: React.FC<CompanyModalBodyProps> = ({ company }) => {
             {industry} Industry
           </p>
           <span
-            className={`mt-2 inline-block rounded-full border px-3 py-1 text-xs font-semibold ${statusColor}`}
+            className={`mt-2 inline-block rounded-full border px-3 py-1 text-center text-xs font-semibold ${statusColor}`}
           >
             {status.toUpperCase()}
           </span>
