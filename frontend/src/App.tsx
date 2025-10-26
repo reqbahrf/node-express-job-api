@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { store } from './app/store';
 import { Toaster } from 'react-hot-toast';
 import AppRouter from './routes/AppRouter';
+import { ModalProvider } from './context/ModalContext';
 
 const titles: Record<string, string> = {
   '/': 'Landing Page',
@@ -29,7 +30,9 @@ const App = () => {
     <Router>
       <Provider store={store}>
         <TitleManager />
-        <AppRouter />
+        <ModalProvider>
+          <AppRouter />
+        </ModalProvider>
         <Toaster />
       </Provider>
     </Router>
