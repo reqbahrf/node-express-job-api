@@ -17,7 +17,7 @@ interface GetCompanyInfoPayload {
 
 interface UpdateCompanyStatusPayload {
   companyId: string;
-  status: string;
+  status: CompanyInfo['status'];
 }
 
 export const companyAPI = {
@@ -85,7 +85,7 @@ export const companyAPI = {
     'company/updateCompanyStatus',
     async ({ companyId, status }: UpdateCompanyStatusPayload, thunkAPI) => {
       try {
-        const { data } = await toast.promise(
+        await toast.promise(
           axios.patch(
             `/api/v1/company/update-status/${companyId}`,
             { status },
@@ -97,12 +97,13 @@ export const companyAPI = {
           ),
           {
             loading: 'Updating company status...',
-            success: 'Company status updated successfully!',
+            success: (response) =>
+              response.data.msg || 'Company status updated successfully!',
             error: (err) =>
               err.response?.data?.msg || 'Failed to update company status',
           },
         );
-        return data;
+        return { companyId, status };
       } catch (error: any) {
         return thunkAPI.rejectWithValue(
           error.response?.data?.message || 'Failed to update company status',
