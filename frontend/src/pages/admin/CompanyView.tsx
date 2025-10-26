@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/store';
 import { companyAPI } from '@/features/company/companyAPI';
 import CompanyCard from '../../components/company/CompanyCard';
-import type { CompanyInfo, QueryParams } from '../../types/company';
+import type { QueryParams } from '../../types/company';
 import { setActiveView } from '@/features/ui/uiSlice';
 import Loading from '@/components/Loading';
 import Input from '@/components/Input';
 
 const CompanyView = () => {
   const dispatch = useAppDispatch();
-  const [companies, setCompanies] = useState<CompanyInfo[]>([]);
+  const { companies } = useAppSelector((state) => state.companies);
   const [queryParams, setQueryParams] = useState<QueryParams>({});
   const getCompanies = useAppSelector(
     (state) => state.loading.loadingState.getCompanies,
@@ -31,7 +31,7 @@ const CompanyView = () => {
 
   useEffect(() => {
     dispatch(setActiveView('Companies'));
-    dispatch(companyAPI.getCompanies(queryParams)).unwrap().then(setCompanies);
+    dispatch(companyAPI.getCompanies(queryParams));
   }, [queryParams]);
 
   return (
