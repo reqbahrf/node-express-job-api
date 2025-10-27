@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "build:backend": "tsc -p backend/tsconfig.json",
-    "start": "node backend/dist/server.js",
-    "server": "tsx watch backend/server.ts",
+    "start": "node --env-file=.env backend/dist/server.js",
+    "server": "tsx watch --env-file=.env backend/server.ts",
     "client": "cd frontend && npm run dev",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "build": "npm run build:backend && cd frontend && npm run build",
@@ -28,7 +28,6 @@
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
     "helmet": "^8.1.0",
