@@ -52,4 +52,21 @@ const FileSchema = new mongoose.Schema<IFile>(
   { timestamps: true }
 );
 
+FileSchema.pre(
+  'deleteOne',
+  { document: true, query: false },
+  async function (next) {
+    const fileID = this._id;
+    if (this.purpose === PURPOSE.REGISTRATION_DOCS) {
+      await mongoose
+        .model('CompanyInfo')
+        .updateMany(
+          { registrationDocs: fileID },
+          { $pull: { registrationDocs: fileID } }
+        );
+    }
+    next();
+  }
+);
+
 export default mongoose.model('File', FileSchema);
