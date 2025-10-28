@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import getAccessToken from '../../utils/getAccessToken';
 import { setLoading } from '../../features/loading/loadingSlice';
+import baseURL from '@/constant/baseURL';
 
 interface UploadFileParams {
   formData: FormData;
