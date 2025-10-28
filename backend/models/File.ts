@@ -1,7 +1,19 @@
 // models/File.ts
 import mongoose from 'mongoose';
+import { PURPOSE } from '../constant/allowedFileConfig.js';
+interface IFile extends mongoose.Document {
+  _id: mongoose.Schema.Types.ObjectId;
+  filename: string;
+  originalname: string;
+  purpose: string;
+  mimetype: string;
+  size: number;
+  path: string;
+  url?: string;
+  createdBy: mongoose.Schema.Types.ObjectId;
+}
 
-const FileSchema = new mongoose.Schema(
+const FileSchema = new mongoose.Schema<IFile>(
   {
     filename: {
       type: String,
