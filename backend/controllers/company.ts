@@ -100,6 +100,7 @@ const getCompanies = async (req: Request, res: Response) => {
 
   const companies = await CompanyInfo.find(queryObject)
     .populate('employer', 'username email')
+    .populate('registrationDocs', 'originalname')
     .sort(sortObject)
     .skip(skip)
     .limit(limit);
