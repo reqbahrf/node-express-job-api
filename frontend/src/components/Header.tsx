@@ -3,7 +3,6 @@ import ActiveAccount from './account/ActiveAccount';
 import { useAppSelector } from '../app/store';
 import DarkModeToggle from './DarkModeToggle';
 import NotificationIcon from './notification/NotificationIcon';
-import NavigationTab from './NavigationTab';
 const Header = () => {
   const { accessToken, user, role } = useAppSelector((state) => state.auth);
   return (
