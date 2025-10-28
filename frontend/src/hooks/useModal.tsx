@@ -1,15 +1,10 @@
 import { useState, useCallback, ReactElement } from 'react';
 import Modal from '../components/Modal';
+import type { OpenModalProps } from '@/types/modal';
 
 interface UseModalReturn {
   modal: ReactElement | null;
-  openModal: (
-    children: ReactElement,
-    size: 'sm' | 'md' | 'full' | 'responsive',
-    title: string,
-    headerColor?: string | undefined,
-    onClose?: () => void,
-  ) => void;
+  openModal: (props: OpenModalProps) => void;
   closeModal: () => void;
 }
 
@@ -18,19 +13,15 @@ const useModal = (): UseModalReturn => {
   const [modalContent, setModalContent] = useState<ReactElement | null>(null);
   const [modalTitle, setModalTitle] = useState('');
   const [modalHeaderColor, setModalHeaderColor] = useState('');
-  const [size, setSize] = useState<'sm' | 'md' | 'full' | 'responsive'>('md');
+  const [size, setSize] = useState<
+    'sm' | 'md' | 'md-f-h' | 'full' | 'responsive'
+  >('md');
   const [onCloseCallback, setOnCloseCallback] = useState<
     (() => void) | undefined
   >(undefined);
 
   const openModal = useCallback(
-    (
-      children: ReactElement,
-      size: 'sm' | 'md' | 'full' | 'responsive',
-      title: string,
-      headerColor?: string | undefined,
-      onClose?: () => void,
-    ) => {
+    ({ children, size, title, headerColor, onClose }: OpenModalProps) => {
       setSize(size);
       setModalContent(children);
       setModalTitle(title);

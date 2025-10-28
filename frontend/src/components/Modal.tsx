@@ -1,13 +1,8 @@
-import { ReactElement, cloneElement, Suspense } from 'react';
+import { cloneElement, Suspense } from 'react';
 import { RiCloseLine } from '@remixicon/react';
-interface ModalProps<T = any> {
-  children: ReactElement<T>;
-  size: 'sm' | 'md' | 'full' | 'responsive';
-  title: string;
-  headerColor?: string;
-  onClose: () => void;
-}
-const Modal = (props: ModalProps) => {
+import type { ModalProps } from '@/types/modal';
+
+const Modal: React.FC<ModalProps> = (props) => {
   const { children, size, title, headerColor, onClose } = props;
 
   let sizeClass = '';
@@ -17,6 +12,9 @@ const Modal = (props: ModalProps) => {
       break;
     case 'md':
       sizeClass = 'min-w-[70vw] max-w-[70vw] min-h-[50vh] max-h-[50vh]';
+      break;
+    case 'md-f-h':
+      sizeClass = 'min-w-[70vw] max-w-[70vw] min-h-full max-h-full';
       break;
     case 'full':
       sizeClass = 'min-w-full max-w-full min-h-full max-h-full';

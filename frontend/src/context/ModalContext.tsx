@@ -1,14 +1,9 @@
-import React, { createContext, useContext, ReactElement } from 'react';
+import React, { createContext, useContext } from 'react';
 import useModal from '../hooks/useModal'; // Import the useModal hook
+import type { OpenModalProps } from '@/types/modal';
 
 interface ModalContextType {
-  openModal: (
-    children: ReactElement,
-    size: 'sm' | 'md' | 'full' | 'responsive',
-    title: string,
-    headerColor?: string | undefined,
-    onClose?: () => void,
-  ) => void;
+  openModal: (props: OpenModalProps) => void;
   closeModal: () => void;
 }
 
