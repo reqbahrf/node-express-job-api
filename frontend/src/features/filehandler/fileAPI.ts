@@ -105,6 +105,31 @@ const fileAPI = {
       thunkAPI.dispatch(setLoading({ key: 'fileDelete', loading: false }));
     }
   }),
+  getFile: createAsyncThunk('file/get', async (id: string, thunkAPI) => {
+    thunkAPI.dispatch(setLoading({ key: 'fileGet', loading: true }));
+    try {
+      const response = await axios.get(`/api/file/view/${id}`, {
+        headers: {
+          Authorization: `Bearer ${getAccessToken(thunkAPI)}`,
+        },
+        signal: thunkAPI.signal,
+        responseType: 'blob',
+      });
+      return {
+        data: response.data,
+        mimetype: response.headers['content-type'],
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : (error as AxiosError<FileError>).response?.data?.msg ||
+            'File not found';
+      return thunkAPI.rejectWithValue(errorMessage);
+    } finally {
+      thunkAPI.dispatch(setLoading({ key: 'fileGet', loading: false }));
+    }
+  }),
 };
 
 export default fileAPI;
