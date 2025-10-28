@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { CompanyInfo } from '../../types/company';
+import React, { useCallback, useState } from 'react';
+import { CompanyInfo } from '@/../../libs/company';
 import { companyAPI } from '@/features/company/companyAPI';
 import {
   RiMapPin2Line,

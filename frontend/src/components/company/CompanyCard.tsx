@@ -1,5 +1,5 @@
 import React from 'react';
-import { CompanyInfo } from '../../types/company';
+import type { CompanyInfo } from '@/../../libs/company';
 import CompanyModalBody from './CompanyModalBody';
 
 import { useModalContext } from '@/context/ModalContext';

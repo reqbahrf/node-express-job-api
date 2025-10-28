@@ -9,7 +9,10 @@ export interface CompanyInfo {
   contactEmail: string;
   contactPhone: string;
   logoUrl: string;
-  registrationDocs: string[];
+  registrationDocs: Array<{
+    _id: string;
+    originalname: string;
+  }>;
   status: 'pending' | 'approved' | 'rejected';
   createdAt?: Date;
   updatedAt?: Date;

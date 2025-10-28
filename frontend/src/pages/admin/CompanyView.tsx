@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/store';
 import { companyAPI } from '@/features/company/companyAPI';
 import CompanyCard from '../../components/company/CompanyCard';
-import type { QueryParams } from '../../types/company';
+import type { QueryParams } from '@/../../libs/company';
 import { setActiveView } from '@/features/ui/uiSlice';
 import Loading from '@/components/Loading';
 import Input from '@/components/Input';

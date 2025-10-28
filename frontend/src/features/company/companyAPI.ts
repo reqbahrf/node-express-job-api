@@ -8,7 +8,7 @@ import type {
   CompanyInfo,
   CompanyState,
   QueryParams,
-} from '../../types/company';
+} from '@/../../libs/company.d';
 
 interface GetCompanyInfoPayload {
   companyId: string;
