@@ -15,11 +15,11 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company }) => {
     <div
       className='group w-full overflow-hidden rounded-lg bg-white p-6 shadow-md transition-shadow duration-300 hover:cursor-pointer hover:bg-gray-100 hover:shadow-lg dark:bg-gray-800 dark:hover:bg-gray-600 dark:hover:shadow-lg'
       onClick={() =>
-        openModal(
-          <CompanyModalBody company={company} />,
-          'md',
-          company.companyName,
-        )
+        openModal({
+          children: <CompanyModalBody company={company} />,
+          size: 'md-f-h',
+          title: company.companyName,
+        })
       }
     >
       <div className='flex flex-col items-start justify-between sm:flex-row sm:items-center'>

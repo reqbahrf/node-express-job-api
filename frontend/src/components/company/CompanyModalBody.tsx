@@ -9,10 +9,42 @@ import {
 } from '@remixicon/react';
 
 import { useAppDispatch } from '@/app/store';
+import FileViewer from '../FileViewer';
 
 interface CompanyModalBodyProps {
   company: CompanyInfo;
 }
+
+const RegistrationDocs = ({
+  docs,
+}: {
+  docs: CompanyInfo['registrationDocs'];
+}) => {
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
+
+  return (
+    <div className='mt-4 flex flex-col gap-2'>
+      {docs.map((doc) => (
+        <div key={doc._id}>
+          <div className='flex items-center justify-between rounded-lg bg-gray-100 p-2 dark:bg-gray-700'>
+            <span className='ms-2 text-lg font-medium text-gray-500 dark:text-gray-300'>
+              {doc.originalname}
+            </span>
+            <button
+              onClick={() =>
+                setSelectedFileId((prev) => (prev === doc._id ? null : doc._id))
+              }
+              className='rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600'
+            >
+              View
+            </button>
+          </div>
+          {selectedFileId === doc._id && <FileViewer fileId={doc._id} />}
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const CompanyModalBody: React.FC<CompanyModalBodyProps> = ({ company }) => {
   const dispatch = useAppDispatch();
@@ -121,6 +153,12 @@ const CompanyModalBody: React.FC<CompanyModalBodyProps> = ({ company }) => {
             </a>
           }
         />
+      </div>
+      <div className='mt-6'>
+        <h2 className='text-2xl font-bold text-gray-900 dark:text-white'>
+          Registration Docs
+        </h2>
+        <RegistrationDocs docs={company.registrationDocs} />
       </div>
       <div className='flex flex-col gap-4 md:flex-row'>
         <select
