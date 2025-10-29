@@ -30,7 +30,6 @@ export interface CompanyInfoFormState {
 }
 
 const CompanyInfoForm = () => {
-  const accessToken = useAppSelector((state) => state.auth.accessToken);
   const isRegistered = useAppSelector((state) => state.company.isRegistered);
   const dispatch = useAppDispatch();
   const [companyFormData, setCompanyFormData] = useState<CompanyInfoFormState>({
@@ -64,7 +63,7 @@ const CompanyInfoForm = () => {
         ...companyFormData,
         registrationDocs: uploadingFilesStatus.map((f) => f.serverId),
       };
-      await dispatch(companyAPI.registerCompany({ formData, accessToken }));
+      await dispatch(companyAPI.registerCompany({ formData }));
     } catch (error) {
       console.error(error);
     } finally {
