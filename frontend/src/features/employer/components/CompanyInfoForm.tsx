@@ -9,7 +9,7 @@ import {
   RiImageLine,
 } from '@remixicon/react';
 import Input from '@/components/Input';
-import FileInput from '@/components/FileInput';
+import { FILE_UPLOAD_PURPOSE } from '@/../../libs/constant/fileUploadPurpose';
 import { setLoading } from '../../loading/loadingSlice';
 import { useAppDispatch, useAppSelector } from '@/app/store';
 import { setActiveView } from '@/features/ui/uiSlice';
@@ -43,8 +43,7 @@ const CompanyInfoForm = () => {
     logoUrl: '',
     registrationDocs: [],
   });
-  const { uploadingFilesStatus, createFileInput } =
-    useFileUpload('registrationDocs');
+  const { uploadingFilesStatus, createFileInput } = useFileUpload();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -61,7 +60,9 @@ const CompanyInfoForm = () => {
     try {
       const formData = {
         ...companyFormData,
-        registrationDocs: uploadingFilesStatus.map((f) => f.serverId),
+        registrationDocs: uploadingFilesStatus[
+          FILE_UPLOAD_PURPOSE.DOCUMENT_REGISTRATION
+        ].map((f) => f.serverId),
       };
       await dispatch(companyAPI.registerCompany({ formData }));
     } catch (error) {
@@ -193,20 +194,33 @@ const CompanyInfoForm = () => {
             </div>
             <div className='relative'>
               <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
-                <RiImageLine className='h-5 w-5 text-gray-400' />
+                <RiMailLine className='h-5 w-5 text-gray-400' />
               </div>
               <Input
-                type='url'
-                name='logoUrl'
-                value={companyFormData.logoUrl}
+                type='email'
+                name='contactEmail'
+                value={companyFormData.contactEmail}
                 onChange={handleChange}
-                placeholder='Logo URL (optional)'
+                placeholder='Contact Email'
                 className='w-full pl-10'
+                required
               />
             </div>
           </div>
           <div className='mt-2'>
-            <label className='mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300'>
+            <label className='text-md mb-2 block font-medium text-gray-700 dark:text-gray-300'>
+              Company Logo
+            </label>
+            {createFileInput({
+              multiple: false,
+              accept: '.jpg,.png,.jpeg',
+              id: 'logoUrl',
+              name: 'logoUrl',
+              purpose: FILE_UPLOAD_PURPOSE.COMPANY_LOGO,
+            })}
+          </div>
+          <div className='mt-2'>
+            <label className='text-md mb-2 block font-medium text-gray-700 dark:text-gray-300'>
               Registration Documents
             </label>
             {createFileInput({
@@ -214,6 +228,7 @@ const CompanyInfoForm = () => {
               accept: '.pdf,.jpg,.png,.jpeg,.doc,.docx',
               id: 'registrationDocs',
               name: 'registrationDocs',
+              purpose: FILE_UPLOAD_PURPOSE.DOCUMENT_REGISTRATION,
             })}
           </div>
           <div className='pt-4'>
