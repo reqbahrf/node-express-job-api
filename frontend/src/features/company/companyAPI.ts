@@ -68,7 +68,7 @@ export const companyAPI = {
         return data;
       } catch (error: any) {
         if (error.response?.status === 404) {
-          navigate('/employer/company-form');
+          navigate('/employer/company-form', { replace: true });
           thunkAPI.rejectWithValue(
             error.response?.data?.msg || 'Company not found',
           );
