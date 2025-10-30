@@ -162,20 +162,6 @@ const CompanyInfoForm = () => {
                 className='w-full pl-10'
               />
             </div>
-            <div className='relative'>
-              <div className='pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3'>
-                <RiMailLine className='h-5 w-5 text-gray-400' />
-              </div>
-              <Input
-                type='email'
-                name='contactEmail'
-                value={companyFormData.contactEmail}
-                onChange={handleChange}
-                placeholder='Contact Email'
-                className='w-full pl-10'
-                required
-              />
-            </div>
           </div>
           <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
             <div className='relative'>
