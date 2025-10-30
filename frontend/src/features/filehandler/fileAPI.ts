@@ -25,7 +25,7 @@ interface FileMetaData {
 
 interface UploadRes {
   msg: string;
-  files: Array<FileMetaData>;
+  filesMeta: Array<FileMetaData>;
 }
 
 interface FileError {
@@ -67,11 +67,11 @@ const fileAPI = {
           },
         );
 
-        if (!response.data.files) {
+        if (!response.data.filesMeta) {
           throw new Error(response.data.msg || 'File upload failed');
         }
 
-        return response.data.files;
+        return response.data.filesMeta;
       } catch (error) {
         const errorMessage =
           error instanceof Error
