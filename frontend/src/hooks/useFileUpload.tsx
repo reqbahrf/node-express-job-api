@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { useAppDispatch } from '@/app/store';
 import fileAPI from '@/features/filehandler/fileAPI';
 import FileInput from '@/components/FileInput';
+import { FILE_UPLOAD_PURPOSE } from '@/../../libs/constant/fileUploadPurpose';
 
 export interface FileUploadStatus {
   localId: string;
@@ -12,21 +13,30 @@ export interface FileUploadStatus {
   status: 'idle' | 'uploading' | 'completed' | 'error';
 }
 
+export interface FilesUploadState {
+  [key: FileUploadPurpose]: FileUploadStatus[];
+}
 interface FileUploadConfig {
   multiple: boolean;
   accept: string;
   id: string;
   name: string;
+  purpose: FileUploadPurpose;
 }
 
-export const useFileUpload = (purpose: string) => {
+export type FileUploadPurpose =
+  (typeof FILE_UPLOAD_PURPOSE)[keyof typeof FILE_UPLOAD_PURPOSE];
+
+export const useFileUpload = () => {
   const dispatch = useAppDispatch();
-  const [uploadingFilesStatus, setUploadingFilesStatus] = useState<
-    FileUploadStatus[]
-  >([]);
+  const [uploadingFilesStatus, setUploadingFilesStatus] =
+    useState<FilesUploadState>({});
 
   const handleFileChange = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (
+      e: React.ChangeEvent<HTMLInputElement>,
+      purpose: FileUploadPurpose,
+    ) => {
       if (!e.target.files?.length) return;
 
       const files = Array.from(e.target.files);
@@ -38,7 +48,10 @@ export const useFileUpload = (purpose: string) => {
         status: 'uploading' as const,
       }));
 
-      setUploadingFilesStatus((prev) => [...prev, ...newFiles]);
+      setUploadingFilesStatus((prev) => ({
+        ...prev,
+        [purpose]: [...(prev[purpose] ? prev[purpose] : []), ...newFiles],
+      }));
 
       const formData = new FormData();
       newFiles.forEach((file) => {
@@ -51,19 +64,21 @@ export const useFileUpload = (purpose: string) => {
             formData,
             purpose,
             onUploadProgress: (progress, localId) => {
-              setUploadingFilesStatus((prev) =>
-                prev.map((item) =>
+              setUploadingFilesStatus((prev) => ({
+                ...prev,
+                [purpose]: prev[purpose].map((item) =>
                   item.localId === localId ? { ...item, progress } : item,
                 ),
-              );
+              }));
             },
           }),
         );
 
         if (fileAPI.uploadFile.fulfilled.match(resultAction)) {
           const uploadedFiles = resultAction.payload;
-          setUploadingFilesStatus((prev) =>
-            prev.map((item) => {
+          setUploadingFilesStatus((prev) => ({
+            ...prev,
+            [purpose]: prev[purpose].map((item) => {
               const uploadedFile = uploadedFiles.find(
                 (uf) => uf.localId === item.localId,
               );
@@ -77,37 +92,41 @@ export const useFileUpload = (purpose: string) => {
                   }
                 : item;
             }),
-          );
+          }));
         } else if (fileAPI.uploadFile.rejected.match(resultAction)) {
           const error = resultAction.payload as string;
-          setUploadingFilesStatus((prev) =>
-            prev.map((item) => ({
+          setUploadingFilesStatus((prev) => ({
+            ...prev,
+            [purpose]: prev[purpose].map((item) => ({
               ...item,
               status: 'error' as const,
               error: error || 'Upload failed',
             })),
-          );
+          }));
           toast.error(`Upload failed: ${error}`);
         }
       } catch (error) {
         console.error('Upload error:', error);
         toast.error('An unexpected error occurred during file upload');
       } finally {
-        // Clear file input
         e.target.value = '';
       }
     },
     [],
   );
 
-  const handleRemoveFile = useCallback(async (serverId: string) => {
-    const resultAction = await dispatch(fileAPI.deleteFile(serverId));
-    if (fileAPI.deleteFile.fulfilled.match(resultAction)) {
-      setUploadingFilesStatus((prev) =>
-        prev.filter((f) => f.serverId !== serverId),
-      );
-    }
-  }, []);
+  const handleRemoveFile = useCallback(
+    async (serverId: string, purpose: FileUploadPurpose) => {
+      const resultAction = await dispatch(fileAPI.deleteFile(serverId));
+      if (fileAPI.deleteFile.fulfilled.match(resultAction)) {
+        setUploadingFilesStatus((prev) => ({
+          ...prev,
+          [purpose]: prev[purpose].filter((f) => f.serverId !== serverId),
+        }));
+      }
+    },
+    [],
+  );
 
   const createFileInput = (config: FileUploadConfig) => {
     return (
@@ -117,6 +136,7 @@ export const useFileUpload = (purpose: string) => {
         id={config.id}
         name={config.name}
         handlers={{
+          purpose: config.purpose,
           uploadingFilesStatus,
           handleFileChange,
           handleRemoveFile,
@@ -127,8 +147,6 @@ export const useFileUpload = (purpose: string) => {
 
   return {
     uploadingFilesStatus,
-    handleFileChange,
-    handleRemoveFile,
     createFileInput,
   };
 };
