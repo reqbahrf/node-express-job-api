@@ -6,7 +6,6 @@ import jobReducer from '../features/job/jobSlice';
 import uiReducer from '../features/ui/uiSlice';
 import companyReducer from '../features/employer/companySlice';
 import companiesReducer from '../features/company/companySlice';
-import fileAPI from '@/features/filehandler/fileAPI';
 
 export const store = configureStore({
   reducer: {
@@ -20,7 +19,12 @@ export const store = configureStore({
   middleware: (get) =>
     get({
       serializableCheck: {
-        ignoredActionPaths: ['payload.data'],
+        ignoredActionPaths: [
+          'payload.data',
+          'meta.arg.navigate',
+          'meta.arg.formData',
+          'meta.arg.onUploadProgress',
+        ],
       },
     }),
 });
