@@ -1,6 +1,6 @@
 // models/File.ts
 import mongoose from 'mongoose';
-import { PURPOSE } from '../constant/allowedFileConfig.js';
+import { FILE_UPLOAD_PURPOSE } from '../../libs/constant/fileUploadPurpose.js';
 interface IFile extends mongoose.Document {
   _id: mongoose.Schema.Types.ObjectId;
   filename: string;
@@ -57,7 +57,7 @@ FileSchema.pre(
   { document: true, query: false },
   async function (next) {
     const fileID = this._id;
-    if (this.purpose === PURPOSE.REGISTRATION_DOCS) {
+    if (this.purpose === FILE_UPLOAD_PURPOSE.DOCUMENT_REGISTRATION) {
       await mongoose
         .model('CompanyInfo')
         .updateMany(
