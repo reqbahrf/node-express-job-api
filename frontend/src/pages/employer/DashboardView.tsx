@@ -1,20 +1,19 @@
 import { useAppDispatch, useAppSelector } from '@/app/store';
 import { setActiveView } from '@/features/ui/uiSlice';
 import { useEffect } from 'react';
-import { companyAPI } from '@/features/employer/companyAPI';
+import { companyAPI } from '@/features/company/companyAPI';
 import { useNavigate } from 'react-router-dom';
 
 const DashboardView = () => {
   const dispatch = useAppDispatch();
+  const { user, userid } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
-  const { user, userid, accessToken } = useAppSelector((state) => state.auth);
   useEffect(() => {
     dispatch(setActiveView('Dashboard'));
-    if (userid && accessToken) {
+    if (userid) {
       dispatch(
         companyAPI.getCompanyInfo({
           companyId: userid!,
-          accessToken,
           navigate,
         }),
       );
