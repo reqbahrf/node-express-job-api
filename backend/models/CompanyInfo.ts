@@ -42,8 +42,9 @@ const CompanyInfoSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Please provide contact number'],
     },
-    logoUrl: {
-      type: String,
+    logo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'File',
       default: '',
     },
     registrationDocs: [
