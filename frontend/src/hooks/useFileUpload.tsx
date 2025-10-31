@@ -32,91 +32,133 @@ export const useFileUpload = () => {
   const [uploadingFilesStatus, setUploadingFilesStatus] =
     useState<FilesUploadState>({});
 
-  const handleFileChange = useCallback(
-    async (
-      e: React.ChangeEvent<HTMLInputElement>,
-      purpose: FileUploadPurpose,
-    ) => {
-      if (!e.target.files?.length) return;
+  const uploadingLogic = async (
+    filesState: FileUploadStatus[],
+    purpose: FileUploadPurpose,
+  ) => {
+    const formData = new FormData();
+    filesState.forEach((file) => {
+      formData.append('files', file.file);
+      formData.append('localIds', file.localId);
+    });
+    try {
+      const resultAction = await dispatch(
+        fileAPI.uploadFile({
+          formData,
+          purpose,
+          onUploadProgress: (progress, localId) => {
+            setUploadingFilesStatus((prev) => ({
+              ...prev,
+              [purpose]: prev[purpose].map((item) =>
+                item.localId === localId ? { ...item, progress } : item,
+              ),
+            }));
+          },
+        }),
+      );
 
-      const files = Array.from(e.target.files);
-      const newFiles = files.map((file) => ({
-        localId: Math.random().toString(36).substring(2, 15),
-        serverId: '',
-        file,
-        progress: 0,
-        status: 'uploading' as const,
-      }));
+      if (fileAPI.uploadFile.fulfilled.match(resultAction)) {
+        const uploadedFiles = resultAction.payload;
+        setUploadingFilesStatus((prev) => ({
+          ...prev,
+          [purpose]: prev[purpose].map((item) => {
+            const uploadedFile = uploadedFiles.find(
+              (uf) => uf.localId === item.localId,
+            );
 
+            return uploadedFile
+              ? {
+                  ...item,
+                  status: 'completed' as const,
+                  serverId: uploadedFile.serverId,
+                  progress: 100,
+                }
+              : item;
+          }),
+        }));
+      } else if (fileAPI.uploadFile.rejected.match(resultAction)) {
+        const error = resultAction.payload as string;
+        setUploadingFilesStatus((prev) => ({
+          ...prev,
+          [purpose]: prev[purpose].map((item) => ({
+            ...item,
+            status: 'error' as const,
+            error: error || 'Upload failed',
+          })),
+        }));
+        toast.error(`Upload failed: ${error}`);
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    purpose: FileUploadPurpose,
+  ) => {
+    if (!e.target.files?.length) return;
+
+    const files = Array.from(e.target.files);
+    const newFiles = files.map((file) => ({
+      localId: Math.random().toString(36).substring(2, 15),
+      serverId: '',
+      file,
+      progress: 0,
+      status: 'uploading' as const,
+    }));
+    try {
       setUploadingFilesStatus((prev) => ({
         ...prev,
         [purpose]: [...(prev[purpose] ? prev[purpose] : []), ...newFiles],
       }));
 
-      const formData = new FormData();
-      newFiles.forEach((file) => {
-        formData.append('files', file.file);
-        formData.append('localIds', file.localId);
-      });
-      try {
-        const resultAction = await dispatch(
-          fileAPI.uploadFile({
-            formData,
-            purpose,
-            onUploadProgress: (progress, localId) => {
-              setUploadingFilesStatus((prev) => ({
-                ...prev,
-                [purpose]: prev[purpose].map((item) =>
-                  item.localId === localId ? { ...item, progress } : item,
-                ),
-              }));
-            },
-          }),
-        );
+      await uploadingLogic(newFiles, purpose);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('An unexpected error occurred during file upload');
+    }
+  };
 
-        if (fileAPI.uploadFile.fulfilled.match(resultAction)) {
-          const uploadedFiles = resultAction.payload;
-          setUploadingFilesStatus((prev) => ({
-            ...prev,
-            [purpose]: prev[purpose].map((item) => {
-              const uploadedFile = uploadedFiles.find(
-                (uf) => uf.localId === item.localId,
-              );
-
-              return uploadedFile
-                ? {
-                    ...item,
-                    status: 'completed' as const,
-                    serverId: uploadedFile.serverId,
-                    progress: 100,
-                  }
-                : item;
-            }),
-          }));
-        } else if (fileAPI.uploadFile.rejected.match(resultAction)) {
-          const error = resultAction.payload as string;
-          setUploadingFilesStatus((prev) => ({
-            ...prev,
-            [purpose]: prev[purpose].map((item) => ({
-              ...item,
-              status: 'error' as const,
-              error: error || 'Upload failed',
-            })),
-          }));
-          toast.error(`Upload failed: ${error}`);
-        }
-      } catch (error) {
-        console.error('Upload error:', error);
-        toast.error('An unexpected error occurred during file upload');
-      } finally {
-        e.target.value = '';
+  const handleReTryUpload = async (
+    localId: string,
+    purpose: FileUploadPurpose,
+  ) => {
+    try {
+      const file = uploadingFilesStatus[purpose].find(
+        (f) => f.localId === localId,
+      );
+      if (!file) {
+        throw new Error('File not found');
       }
-    },
-    [],
-  );
 
-  const handleRemoveFile = useCallback(
-    async (serverId: string, purpose: FileUploadPurpose) => {
+      setUploadingFilesStatus((prev) => ({
+        ...prev,
+        [purpose]: prev[purpose].map((item) =>
+          item.localId === localId
+            ? { ...item, status: 'uploading' as const, progress: 0 }
+            : item,
+        ),
+      }));
+      await uploadingLogic([file], purpose);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('An unexpected error occurred during file upload');
+    }
+  };
+
+  const handleRemoveFile = async (
+    serverId: string | null,
+    localId: string,
+    purpose: FileUploadPurpose,
+  ) => {
+    if (!serverId && localId) {
+      setUploadingFilesStatus((prev) => ({
+        ...prev,
+        [purpose]: prev[purpose].filter((f) => f.localId !== localId),
+      }));
+      return;
+    } else if (serverId && localId) {
       const resultAction = await dispatch(fileAPI.deleteFile(serverId));
       if (fileAPI.deleteFile.fulfilled.match(resultAction)) {
         setUploadingFilesStatus((prev) => ({
@@ -124,9 +166,8 @@ export const useFileUpload = () => {
           [purpose]: prev[purpose].filter((f) => f.serverId !== serverId),
         }));
       }
-    },
-    [],
-  );
+    }
+  };
 
   const createFileInput = (config: FileUploadConfig) => {
     return (
@@ -139,6 +180,7 @@ export const useFileUpload = () => {
           purpose: config.purpose,
           uploadingFilesStatus,
           handleFileChange,
+          handleReTryUpload,
           handleRemoveFile,
         }}
       />
