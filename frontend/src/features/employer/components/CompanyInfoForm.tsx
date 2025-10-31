@@ -25,7 +25,7 @@ export interface CompanyInfoFormState {
   website: string;
   contactEmail: string;
   contactPhone: string;
-  logoUrl: string;
+  logo: string;
   registrationDocs: string[];
 }
 
@@ -40,7 +40,7 @@ const CompanyInfoForm = () => {
     website: '',
     contactEmail: '',
     contactPhone: '',
-    logoUrl: '',
+    logo: '',
     registrationDocs: [],
   });
   const { uploadingFilesStatus, createFileInput } = useFileUpload();
@@ -60,6 +60,8 @@ const CompanyInfoForm = () => {
     try {
       const formData = {
         ...companyFormData,
+        logo: uploadingFilesStatus[FILE_UPLOAD_PURPOSE.COMPANY_LOGO][0]
+          .serverId,
         registrationDocs: uploadingFilesStatus[
           FILE_UPLOAD_PURPOSE.DOCUMENT_REGISTRATION
         ].map((f) => f.serverId),
