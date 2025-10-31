@@ -1,5 +1,5 @@
 import React from 'react';
-import { RiFileTextLine, RiCloseLine } from '@remixicon/react';
+import { RiFileTextLine, RiCloseLine, RiRestartLine } from '@remixicon/react';
 import type {
   FilesUploadState,
   FileUploadPurpose,
@@ -17,7 +17,12 @@ interface FileInputProps {
       e: React.ChangeEvent<HTMLInputElement>,
       purpose: FileUploadPurpose,
     ) => void;
-    handleRemoveFile: (serverId: string, purpose: FileUploadPurpose) => void;
+    handleReTryUpload: (localId: string, purpose: FileUploadPurpose) => void;
+    handleRemoveFile: (
+      serverId: string | null,
+      localId: string,
+      purpose: FileUploadPurpose,
+    ) => void;
   };
 }
 
@@ -30,6 +35,7 @@ const FileInput: React.FC<FileInputProps> = ({
     purpose,
     uploadingFilesStatus,
     handleFileChange,
+    handleReTryUpload,
     handleRemoveFile,
   },
 }) => {
@@ -85,16 +91,33 @@ const FileInput: React.FC<FileInputProps> = ({
                     <span className='text-xs text-gray-400'>
                       {(upload.file.size / 1024 / 1024).toFixed(2)} MB
                     </span>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        handleRemoveFile(upload.serverId, purpose);
-                      }}
-                      className='ml-2 text-red-500 hover:text-red-700'
-                      disabled={upload.status === 'uploading'}
-                    >
-                      <RiCloseLine className='h-4 w-4' />
-                    </button>
+                    <div className='flex items-center'>
+                      {upload.status === 'error' && (
+                        <button
+                          type='button'
+                          onClick={() => {
+                            handleReTryUpload(upload.localId, purpose);
+                          }}
+                          className='ml-2 text-blue-500 hover:text-blue-700'
+                        >
+                          <RiRestartLine className='h-4 w-4' />
+                        </button>
+                      )}
+                      <button
+                        type='button'
+                        onClick={() => {
+                          handleRemoveFile(
+                            upload?.serverId || null,
+                            upload.localId,
+                            purpose,
+                          );
+                        }}
+                        className='ml-2 text-red-500 hover:text-red-700'
+                        disabled={upload.status === 'uploading'}
+                      >
+                        <RiCloseLine className='h-4 w-4' />
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div className='mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700'>
@@ -133,16 +156,33 @@ const FileInput: React.FC<FileInputProps> = ({
                     <span className='text-xs text-gray-400'>
                       {(upload.file.size / 1024 / 1024).toFixed(2)} MB
                     </span>
-                    <button
-                      type='button'
-                      onClick={() => {
-                        handleRemoveFile(upload.serverId, purpose);
-                      }}
-                      className='ml-2 text-red-500 hover:text-red-700'
-                      disabled={upload.status === 'uploading'}
-                    >
-                      <RiCloseLine className='h-4 w-4' />
-                    </button>
+                    <div className='flex items-center'>
+                      {upload.status === 'error' && (
+                        <button
+                          type='button'
+                          onClick={() => {
+                            handleReTryUpload(upload.localId, purpose);
+                          }}
+                          className='ml-2 text-blue-500 hover:text-blue-700'
+                        >
+                          <RiRestartLine className='h-4 w-4' />
+                        </button>
+                      )}
+                      <button
+                        type='button'
+                        onClick={() => {
+                          handleRemoveFile(
+                            upload.serverId || null,
+                            upload.localId,
+                            purpose,
+                          );
+                        }}
+                        className='ml-2 text-red-500 hover:text-red-700'
+                        disabled={upload.status === 'uploading'}
+                      >
+                        <RiCloseLine className='h-4 w-4' />
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div className='mt-1 h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700'>
