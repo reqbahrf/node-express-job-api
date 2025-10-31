@@ -5,12 +5,17 @@ import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import { ROLES } from '@/constant/roles';
 import { LayoutProvider } from '../context/LayoutContext';
 import EmployerDashboardView from '../pages/employer/DashboardView';
+import useEmployerOnboardingGuard from '../hooks/useEmployerOnboardingGuard';
 const EmployerCompanyForm = lazy(
   () => import('../features/employer/components/CompanyInfoForm'),
+);
+const PendingApprovalNotice = lazy(
+  () => import('../features/employer/components/PendingApprovalNotice'),
 );
 const Account = lazy(() => import('../pages/Account'));
 
 const EmployerRouter = () => {
+  useEmployerOnboardingGuard();
   return (
     <Suspense fallback={<Loading />}>
       <LayoutProvider>
@@ -28,6 +33,14 @@ const EmployerRouter = () => {
             element={
               <ProtectedRoute allowedRoles={[ROLES.EMPLOYER]}>
                 <EmployerCompanyForm />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='pending-approval'
+            element={
+              <ProtectedRoute allowedRoles={[ROLES.EMPLOYER]}>
+                <PendingApprovalNotice />
               </ProtectedRoute>
             }
           />
