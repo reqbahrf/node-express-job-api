@@ -1,24 +1,21 @@
 import { useAppDispatch, useAppSelector } from '@/app/store';
 import { setActiveView } from '@/features/ui/uiSlice';
 import { useEffect } from 'react';
-import { companyAPI } from '@/features/company/companyAPI';
-import { useNavigate } from 'react-router-dom';
+import useEmployerOnboardingGuard from '../../hooks/useEmployerOnboardingGuard';
+import Loading from '../../components/Loading';
 
 const DashboardView = () => {
   const dispatch = useAppDispatch();
-  const { user, userid } = useAppSelector((state) => state.auth);
-  const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
+  const isChecking = useEmployerOnboardingGuard();
+
   useEffect(() => {
-    dispatch(setActiveView('Dashboard'));
-    if (userid) {
-      dispatch(
-        companyAPI.getCompanyInfo({
-          companyId: userid!,
-          navigate,
-        }),
-      );
-    }
-  }, []);
+    dispatch(setActiveView(isChecking ? '' : 'Dashboard'));
+  }, [isChecking]);
+
+  if (isChecking) {
+    return <Loading />;
+  }
   return (
     <>
       <h1 className='text-4xl font-bold'>Welcome back, {user}</h1>
