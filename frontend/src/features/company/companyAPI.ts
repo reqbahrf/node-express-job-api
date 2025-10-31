@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import type { NavigateFunction } from 'react-router-dom';
 import { setLoading } from '../loading/loadingSlice';
 import { toast } from 'react-hot-toast';
 import getAccessToken from '@/utils/getAccessToken';
@@ -12,7 +11,6 @@ import type {
 
 interface GetCompanyInfoPayload {
   companyId: string;
-  navigate: NavigateFunction;
 }
 
 interface UpdateCompanyStatusPayload {
@@ -49,7 +47,7 @@ export const companyAPI = {
   ),
   getCompanyInfo: createAsyncThunk(
     'company/getCompanyInfo',
-    async ({ companyId, navigate }: GetCompanyInfoPayload, thunkAPI) => {
+    async ({ companyId }: GetCompanyInfoPayload, thunkAPI) => {
       const dispatchPayload = {
         key: 'getCompanyInfo',
         loading: true,
@@ -67,12 +65,6 @@ export const companyAPI = {
         );
         return data;
       } catch (error: any) {
-        if (error.response?.status === 404) {
-          navigate('/employer/company-form', { replace: true });
-          thunkAPI.rejectWithValue(
-            error.response?.data?.msg || 'Company not found',
-          );
-        }
         return thunkAPI.rejectWithValue(
           error.response?.data?.message || 'Failed to get company info',
         );
