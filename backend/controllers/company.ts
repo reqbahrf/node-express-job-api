@@ -39,8 +39,8 @@ const getCompany = async (req: Request, res: Response) => {
     employer: id,
   });
   if (!company) {
-    return res.status(StatusCodes.NOT_FOUND).json({
-      msg: 'Company not found or not registered, please register first',
+    return res.status(StatusCodes.OK).json({
+      company: {},
       isRegistered: false,
     });
   }
